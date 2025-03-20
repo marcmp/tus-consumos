@@ -1,0 +1,691 @@
+/* =======================================
+   BASE STYLES
+   ======================================= */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f8fa;
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* =======================================
+   LAYOUT
+   ======================================= */
+#app-container {
+    width: 100%;
+    min-height: 100vh;
+}
+
+#dashboard-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+/* =======================================
+   TYPOGRAPHY
+   ======================================= */
+h1, h2, h3, h4, h5, h6 {
+    color: #333;
+    margin-top: 0;
+}
+
+/* =======================================
+   HEADER & FOOTER
+   ======================================= */
+.dashboard-header {
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    color: white;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-bottom: 15px;
+    position: relative;
+    z-index: 10;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.header-content h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.app-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #eee;
+    padding: 15px 0;
+    margin-top: auto;
+    width: 100%;
+    position: relative;
+    z-index: 101;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 0 20px;
+}
+
+.footer-content p {
+    margin: 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.footer-divider {
+    color: #ccc;
+    font-weight: 300;
+}
+
+.footer-content a {
+    color: #6e8efb;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.footer-content a:hover {
+    color: #a777e3;
+    text-decoration: underline;
+}
+
+/* =======================================
+   LOGIN FORM
+   ======================================= */
+#login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 46px);
+    background: linear-gradient(135deg, #f5f7fa, #e4e7eb);
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    padding-bottom: 46px;
+}
+
+.login-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 420px;
+    padding: 40px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.login-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.login-card h2 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: #333;
+    font-size: 26px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.login-card p {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 15px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #444;
+    font-size: 15px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    border-color: #6e8efb;
+    box-shadow: 0 0 0 3px rgba(110, 142, 251, 0.1);
+    outline: none;
+}
+
+.login-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+    margin-top: 10px;
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(110, 142, 251, 0.4);
+    background: linear-gradient(135deg, #5d7fe9, #9666d1);
+}
+
+.login-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(110, 142, 251, 0.4);
+}
+
+.privacy-notice {
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    text-align: center;
+}
+
+.privacy-notice p {
+    font-size: 13px;
+    color: #888;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* =======================================
+   USER ACTIONS
+   ======================================= */
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.username {
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.logout-btn {
+    background-color: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.logout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #e9ecef;
+}
+
+.logout-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* =======================================
+   TABLE CONTAINER
+   ======================================= */
+#table-container {
+    max-width: 1200px;
+    margin: 15px auto;
+    padding: 0;
+    animation: slideUp 0.5s ease-in-out;
+}
+
+/* =======================================
+   SUPPLY INFO CARD
+   ======================================= */
+.supply-info-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.supply-info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.supply-info-header {
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+}
+
+.supply-info-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.supply-info-content {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+}
+
+.supply-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-label {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.info-value {
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+}
+
+.info-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.info-card h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+/* =======================================
+   CONSUMPTION TABLE
+   ======================================= */
+.consumption-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.consumption-table td, 
+.consumption-table th {
+    padding: 12px 15px;
+    text-align: center;
+    border: 1px solid #ddd;
+    background-color: white;
+}
+
+/* Table structure */
+.consumption-table .row-label {
+    font-weight: bold;
+    text-align: left;
+    background-color: white !important;
+}
+
+.consumption-table .row-group-header {
+    background-color: white !important;
+    font-weight: bold;
+    text-align: left;
+    vertical-align: middle;
+    border-right: 1px solid #ddd;
+}
+
+/* Numeric cells - right aligned and monospace */
+.consumption-table .data-cell {
+    text-align: right;
+    font-family: monospace;
+    padding-right: 15px;
+    background-color: #f9d423; /* Match copy-all-btn color */
+}
+
+/* Section styles */
+.consumption-table .section-header td:not(.data-cell) {
+    background-color: white !important;
+}
+
+/* Apply yellow background to description and days rows */
+.consumption-table .description-row td.data-cell,
+.consumption-table .days-row td.data-cell {
+    background-color: #f9d423 !important; /* Match copy-all-btn color */
+}
+
+.consumption-table .days-row {
+    border-top: 2px solid #000;
+    border-bottom: 2px solid #000;
+}
+
+/* Target the second power row specifically */
+.consumption-table tr.power-section.power-row:nth-of-type(5) {
+    border-bottom: 2px solid #000;
+}
+
+/* Override total row background */
+.consumption-table .total-row td.data-cell {
+    font-weight: bold;
+    background-color: white !important;
+}
+
+/* Excedentes row - special color to match its button */
+.consumption-table .excedentes-row td.data-cell {
+    background-color: #6ECF70 !important; /* Lighter green to match the excedentes button */
+    color: #000;
+}
+
+/* =======================================
+   DATA TABLE
+   ======================================= */
+.data-table {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    overflow-x: auto;
+}
+
+.data-table h3 {
+    margin-top: 0;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.data-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.data-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #555;
+}
+
+.data-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* =======================================
+   BUTTONS
+   ======================================= */
+.copy-btn {
+    border: none;
+    border-radius: 6px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-right: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.copy-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.copy-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.copy-all-btn {
+    background: linear-gradient(135deg, #f9d423, #f8b500);
+    color: #000;
+}
+
+.copy-all-btn:hover {
+    background: linear-gradient(135deg, #f8b500, #f9d423);
+}
+
+.copy-excedentes-btn {
+    background: linear-gradient(135deg, #6ECF70, #4CAF50);
+    color: #000;
+}
+
+.copy-excedentes-btn:hover {
+    background: linear-gradient(135deg, #4CAF50, #6ECF70);
+}
+
+.copy-info {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #666;
+    font-style: italic;
+}
+
+/* =======================================
+   NOTIFICATIONS & MODALS
+   ======================================= */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    max-width: 400px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    padding: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    z-index: 1001;
+    animation: slideIn 0.3s ease-in-out;
+}
+
+.notification-content {
+    position: relative;
+    padding-right: 20px;
+}
+
+.notification p {
+    margin: 5px 0;
+}
+
+.close-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #721c24;
+}
+
+.fade-out {
+    animation: fadeOut 0.5s ease-in-out forwards;
+}
+
+/* =======================================
+   MODAL
+   ======================================= */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    padding: 30px;
+    width: 500px;
+    max-width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+.supply-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.supply-item {
+    background-color: #f5f7fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.supply-item:hover {
+    background-color: #e8f0fe;
+    border-color: #6e8efb;
+    transform: translateY(-2px);
+}
+
+.supply-item strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+/* =======================================
+   LOADING SPINNER
+   ======================================= */
+.loading-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #6e8efb;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loading-container p {
+    margin-top: 20px;
+    color: #555;
+    font-size: 16px;
+}
+
+/* =======================================
+   UTILITIES
+   ======================================= */
+.error-message {
+    color: #f44336;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.copyable-cell {
+    background-color: #fff9c4;
+}
+
+/* =======================================
+   ANIMATIONS
+   ======================================= */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+} 

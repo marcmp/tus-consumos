@@ -1,0 +1,18 @@
+{
+  "name": "tus-consumos",
+  "version": "1.0.0",
+  "description": "Datadis client for ElGrinchEnergetico",
+  "type": "module",
+  "main": "script.js",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "mock-server": "node mock/server.js"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "json-server": "^0.17.4"
+  }
+}

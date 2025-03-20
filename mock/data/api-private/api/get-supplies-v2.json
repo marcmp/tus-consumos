@@ -1,0 +1,90 @@
+{
+  "supplies" : [ {
+    "address" : "LLEIDA 1",
+    "cups" : "ES0021000000123456AA",
+    "postalCode" : "43851",
+    "province" : "Tarragona",
+    "municipality" : "MADRID",
+    "distributor" : "EDISTRIBUCIÓN",
+    "validDateFrom" : "2024/03/03",
+    "validDateTo" : "",
+    "pointType" : 5,
+    "distributorCode" : "2"
+  }, {
+    "address" : "LLEIDA 2",
+    "cups" : "ES0021000000123456AB",
+    "postalCode" : "43852",
+    "province" : "Barcelona",
+    "municipality" : "MADRID",
+    "distributor" : "EDISTRIBUCIÓN",
+    "validDateFrom" : "2023/12/14",
+    "validDateTo" : "2023/12/15",
+    "pointType" : 5,
+    "distributorCode" : "2"
+  }, {
+    "address" : "LLEIDA 3",
+    "cups" : "ES0021000000123456AC",
+    "postalCode" : "43853",
+    "province" : "Barcelona",
+    "municipality" : "MADRID",
+    "distributor" : "EDISTRIBUCIÓN",
+    "validDateFrom" : "2024/11/06",
+    "validDateTo" : "2024/12/03",
+    "pointType" : 5,
+    "distributorCode" : "2"
+  }, {
+    "address" : "LLEIDA 4",
+    "cups" : "ES0021000000123456AD",
+    "postalCode" : "43854",
+    "province" : "Barcelona",
+    "municipality" : "MADRID",
+    "distributor" : "EDISTRIBUCIÓN",
+    "validDateFrom" : "2024/03/20",
+    "validDateTo" : "2025/01/30",
+    "pointType" : 5,
+    "distributorCode" : "2"
+  }, {
+    "address" : "LLEIDA 5",
+    "cups" : "ES0021000000123456AE",
+    "postalCode" : "43855",
+    "province" : "Barcelona",
+    "municipality" : "MADRID",
+    "distributor" : "EDISTRIBUCIÓN",
+    "validDateFrom" : "2024/01/27",
+    "validDateTo" : "2024/11/05",
+    "pointType" : 5,
+    "distributorCode" : "2"
+  } ],
+  "distributorError": [
+    {
+        "distributorCode": "5",
+        "distributorName": "UFD",
+        "errorCode": "10",
+        "errorDescription": "Error interno distribuidora"
+    },
+    {
+        "distributorCode": "1",
+        "distributorName": "VIESGO",
+        "errorCode": "2",
+        "errorDescription": "La distribuidora no puede facilitar información a ese NIF"
+    },
+    {
+        "distributorCode": "4",
+        "distributorName": "ASEME",
+        "errorCode": "2",
+        "errorDescription": "La distribuidora no puede facilitar información a ese NIF"
+    },
+    {
+        "distributorCode": "6",
+        "distributorName": "EOSA",
+        "errorCode": "2",
+        "errorDescription": "La distribuidora no puede facilitar información a ese NIF"
+    },
+    {
+        "distributorCode": "8",
+        "distributorName": "I-DE",
+        "errorCode": "2",
+        "errorDescription": "La distribuidora no puede facilitar información a ese NIF"
+    }
+  ]
+}

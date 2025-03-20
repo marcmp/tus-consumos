@@ -1,0 +1,46 @@
+{
+    "contract": [
+        {
+        "cups": "ES0021000000123456AB",
+        "distributor": "EDISTRIBUCIÓN",
+        "marketer": "UMEME ENERGIA SOCIEDAD LIMITADA",
+        "tension": "Baja tensión",
+        "accessFare": "BAJA TENSION y POTENCIA <= 15 kW",
+        "province": "Madrid",
+        "municipality": "MADRID",
+        "postalCode": "07020",
+        "contractedPowerkW": [
+            3,6,
+            4.2
+        ],
+        "timeDiscrimination": "TARIFA DE TRES PERIODOS",
+        "modePowerControl": "ICP",
+        "startDate": "2024/03/03",
+        "endDate": "",
+        "codeFare": "2T",
+        "selfConsumptionTypeCode": null,
+        "selfConsumptionTypeDesc": null,
+        "section": null,
+        "subsection": null,
+        "partitionCoefficient": null,
+        "cau": null,
+        "installedCapacity": null,
+        "dateOwner": [
+            {
+            "startDate": "2005-09-22",
+            "endDate": ""
+            }
+        ],
+        "lastMarketerDate": "2024/03/03",
+        "maxPowerInstall": "5.5"
+        }
+    ],
+    "distributorError":[
+        {
+        "distributorCode":"1",
+        "distributorName":"VIESGO",
+        "errorCode":"10",
+        "errorDescription":"Error interno distribuidora"
+        }
+    ]
+  }

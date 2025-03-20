@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tus consumos eléctricos</title>
+  <link rel="stylesheet" href="styles.css">
+  <script data-goatcounter="https://tus-consumos.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</head>
+<body>
+  <div id="login-container">
+    <!-- The login form will be dynamically inserted here -->
+  </div>
+  
+  <div id="dashboard-container" style="display: none;">
+    <div id="table-container"></div>
+  </div>
+  
+  <footer class="app-footer">
+    <div class="footer-content">
+      <p>Hecho en Barcelona</p>
+      <span class="footer-divider">-</span>
+      <a href="https://www.gnu.org/licenses/agpl-3.0.en.html" target="_blank" rel="noopener noreferrer">Licencia AGPL v3</a>
+      <span class="footer-divider">-</span>
+      <a href="https://github.com/marcmp/tus-Consumos/" target="_blank" rel="noopener noreferrer">Código fuente</a>
+      <span class="footer-divider">-</span>
+      <a href="https://github.com/marcmp/tus-Consumos/issues" target="_blank" rel="noopener noreferrer"> Errores y sugerencias</a>
+    </div>
+  </footer>
+  
+  <script type="module" src="apiCalls.js"></script>
+  <script type="module" src="script.js"></script>
+</body>
+</html>
