@@ -1,10 +1,10 @@
 # Tus Consumos
 
-A privacy-first tool to import and review your Spanish electricity consumption/production data.
+A privacy-first tool to import and review your electricity consumption/production data.
 
 ## Project Overview
 
-Tus Consumos is a client-side web application that interacts with Datadis APIs to retrieve and display energy data.
+Tus Consumos is a client-side web application that uses the Datadis APIs to retrieve and display energy usage data for electricity contracts in Spain.
 
 This tool can be used as a companion app to "El Grinch Energetico" Excel spreadsheet to help you find the best energy price option in Spain based on your consumption habits.
 
