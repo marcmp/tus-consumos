@@ -1,6 +1,6 @@
 # Tus Consumos
 
-A privacy-first tool for to import and review your Spanish electricity consumption/production data.
+A privacy-first Datadis API client to import and review your Spanish electricity consumption/production data.
 
 ## Project Overview
 
@@ -14,7 +14,7 @@ Privacy is and should be a first-class citizen in this project. The tool only ma
 
 ## Features
 
-- User authentication with Datadis.com credentials (you'll need an account first).
+- User authentication with Datadis.es credentials (you'll need an account first).
 - Retrieval of electricity consumption and production data.
 - Visualization of monthly consumption and production pattern.
 - Easy export functionality to "El Grinch Energético" Excel spreadsheet.
@@ -24,7 +24,7 @@ Privacy is and should be a first-class citizen in this project. The tool only ma
 
 ## How to use
 
-1. Create a [Datadis account](https://www.datadis.com).
+1. Create a [Datadis account](https://www.datadis.es).
 2. Log-in to [Tus Consumos website](https://marcmp.github.io/tus-consumos/) using your Datadis credentials.
 3. Download the latest [Grinch Energético excel spreadsheet](https://grinchenergetico.com/comparador-de-tarifas/).
 4. Paste your consumption/production data to the spreadsheet to calculate your best electricity bill price.
