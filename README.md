@@ -1,6 +1,6 @@
 # Tus Consumos
 
-A privacy-first Datadis API client to import and review your Spanish electricity consumption/production data.
+A privacy-first tool to import and review your Spanish electricity consumption/production data.
 
 ## Project Overview
 
