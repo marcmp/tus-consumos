@@ -1,6 +1,6 @@
 # Tus Consumos
 
-A privacy-first tool to import and review your electricity consumption/production data.
+A privacy-first tool to import and review your electricity consumption & production data.
 
 ## Project Overview
 
