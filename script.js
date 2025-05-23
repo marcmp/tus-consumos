@@ -54,13 +54,13 @@ export function getPeriod(date, time) {
   if (nationalFestivities.includes(monthDay)) {
     return 'P3';
   }
-  
+
   // Check for weekends
   const dayOfWeek = new Date(date).getDay();
   if (dayOfWeek === 0 || dayOfWeek === 6) {
     return 'P3';
   }
-  
+
   // Check time period
   const hour = parseInt(time.split(':')[0], 10);
   return hourToPeriodMap[hour] || 'P3';
@@ -81,16 +81,16 @@ function enrichData(data) {
     console.warn('enrichData received invalid data:', data);
     return [];
   }
-  
+
   console.log(`Enriching ${data.length} consumption data entries with periods`);
-  
+
   return data.map(entry => {
     // Skip invalid entries
     if (!entry || !entry.date || !entry.time) {
       console.warn('Invalid entry in consumption data:', entry);
       return entry;
     }
-    
+
     return {
       ...entry,
       period: entry.period || getPeriod(entry.date, entry.time),
@@ -107,43 +107,43 @@ function enrichData(data) {
  */
 function buildMonthlySummary(data) {
   const summary = {};
-  
+
   // Check if data is valid and has entries
   if (!Array.isArray(data) || data.length === 0) {
     console.warn('buildMonthlySummary received empty or invalid data');
     return summary;
   }
-  
+
   // Log a sample entry to ensure it has the proper structure
   if (data.length > 0) {
     console.log('Sample data entry for debugging:', data[0]);
   }
-  
-  data.forEach(entry => {    
+
+  data.forEach(entry => {
     const monthKey = entry.date.slice(0, 7); // Format: "YYYY/MM"
     if (!summary[monthKey]) {
       summary[monthKey] = { P1: 0, P2: 0, P3: 0, surplusEnergyKWh: 0 };
     }
-    
+
     // Make sure we have a valid period, default to P3 if missing
     const period = entry.period || getPeriod(entry.date, entry.time);
-    
+
     // Add consumption to the appropriate period
     summary[monthKey][period] += entry.consumptionKWh;
-    
+
     // Add surplus energy if available
-    
+
     if (entry.surplusEnergyKWh) {
       summary[monthKey].surplusEnergyKWh += entry.surplusEnergyKWh;
     }
   });
-  
+
   // Debug log the summary for the first month
   const firstMonthKey = Object.keys(summary)[0];
   if (firstMonthKey) {
     console.log(`Monthly summary for ${firstMonthKey}:`, summary[firstMonthKey]);
   }
-  
+
   return summary;
 }
 
@@ -169,7 +169,7 @@ function calculatePeriodTotal(data, period) {
 }
 
 /**
- * Process consumption data and prepare summary 
+ * Process consumption data and prepare summary
  * @param {Array} data - Raw consumption data
  * @returns {Object} Processed data with summaries
  */
@@ -194,13 +194,13 @@ function processConsumptionData(data) {
 
   // First enrich the data with period information
   const enrichedData = enrichData(data);
-  
+
   // Log enriched data to help with debugging
   console.log('Enriched data (first 24 entries):', enrichedData.slice(0, 24));
-  
+
   // Then build the monthly summary
   const summaryData = buildMonthlySummary(enrichedData);
-  
+
   // Create consumption summaries
   const totalConsumption = calculateTotalConsumption(enrichedData);
   const summaries = {
@@ -212,11 +212,11 @@ function processConsumptionData(data) {
     },
     byMonth: prepareMonthlyData(summaryData)
   };
-  
+
   // Log summary data for debugging
   console.log('Total consumption:', totalConsumption);
   console.log('Period totals:', summaries.byPeriod);
-  
+
   return {
     enrichedData,
     summaryData,
@@ -240,34 +240,34 @@ function prepareMonthlyData(summaryData) {
     const now = new Date();
     startKey = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}`;
   }
-  
+
   const [startYear, startMonth] = startKey.split('/').map(Number);
   const startingDate = new Date(startYear, startMonth - 1, 1);
-  
+
   // Build an array of 12 consecutive month keys
   const months = [];
   const monthData = {};
-  
+
   for (let i = 0; i < 12; i++) {
     const currentDate = new Date(startingDate);
     currentDate.setMonth(startingDate.getMonth() + i);
     const key = `${currentDate.getFullYear()}/${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
     months.push(key);
-    
+
     // If there's no data for this month, add default values
     if (!summaryData[key]) {
       monthData[key] = { P1: 0, P2: 0, P3: 0, surplusEnergyKWh: 0 };
     } else {
       monthData[key] = { ...summaryData[key] };
     }
-    
+
     // Calculate the actual number of days for the month
     monthData[key].days = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
-    
+
     // Add formatted display version of the month
     monthData[key].display = formatMonthDisplay(key);
   }
-  
+
   return {
     months,
     data: monthData
@@ -290,7 +290,7 @@ function formatMonthDisplay(monthKey) {
  * UI FUNCTIONS
  * =================================
  *
- * Only run in browser 
+ * Only run in browser
  */
 
 // Check if we're in a browser environment
@@ -299,7 +299,7 @@ const isBrowser = typeof window !== 'undefined';
 if (isBrowser) {
   // Initialize the application when the DOM is loaded
   document.addEventListener('submit', handleFormSubmissions);
-  
+
   // Set the initial page load
   window.onload = function() {
     // Check if user is already logged in
@@ -317,7 +317,7 @@ if (isBrowser) {
 function initializeApp() {
   // Set up event listeners
   document.addEventListener('submit', handleFormSubmissions);
-  
+
   // Show the login form if not authenticated
   if (!checkAuth()) {
     showLoginForm(); // Explicitly call showLoginForm to ensure the form is rendered
@@ -345,31 +345,31 @@ async function handleFormSubmissions(event) {
 async function handleLoginFormSubmission(form) {
   const username = document.getElementById('username').value;
   const password = document.getElementById('password').value;
-  
+
   console.log('Login form submitted:', { username });
   showLoadingSpinner('Autenticando usuario...');
-  
+
   try {
     // Only handle authentication in this function
     const authorizationToken = await authorizeApiCall(username, password);
     console.log('Login successful');
-    
+
     // Store the token and username in sessionStorage
     sessionStorage.setItem('authToken', authorizationToken);
     sessionStorage.setItem('isLoggedIn', 'true');
     sessionStorage.setItem('username', username);
-    
+
     // Now delegate to fetchFreshData for all the data retrieval logic
     // Pass false to indicate we should reuse existing spinner rather than create a new one
     await fetchFreshData(authorizationToken, false);
-    
+
   } catch (error) {
     console.error('Error during login:', error);
     hideLoadingSpinner();
-    
+
     // Handle only login-specific errors here
-    if (error.message && (error.message.includes('Login failed') || 
-                         error.message.includes('401') || 
+    if (error.message && (error.message.includes('Login failed') ||
+                         error.message.includes('401') ||
                          error.message.includes('authentication'))) {
       alert('Credenciales incorrectas. Por favor, verifica tu usuario y contraseña.');
     } else {
@@ -382,19 +382,20 @@ async function handleLoginFormSubmission(form) {
  * Process consumption data and display on dashboard
  * @param {Array} data - Raw consumption data
  * @param {Object} contractDetails - Contract details with p1 and p2 values
+ * @param {Object} suppliesResult - Supplies result from API
  */
-function processAndDisplayData(data, contractDetails) {
+function processAndDisplayData(data, contractDetails, suppliesResult) {
   // Only process the data once
   const processedData = processConsumptionData(data);
-  
+
   // Get CUPS from the data if available, or from contractDetails
   const cups = data.length > 0 ? data[0].cups : (contractDetails.cups || 'No disponible');
-  
+
   // Extract address info if it exists in contractDetails
   const addressInfo = contractDetails.addressInfo || 'No disponible';
-  
+
   // Pass the processed data to the dashboard renderer with CUPS and address
-  renderDashboard(processedData, addressInfo, cups, contractDetails);
+  renderDashboard(processedData, addressInfo, cups, contractDetails, suppliesResult);
 }
 
 /**
@@ -403,16 +404,17 @@ function processAndDisplayData(data, contractDetails) {
  * @param {string} addressInfo - Address information for the supply
  * @param {string} cups - CUPS for the supply
  * @param {Object} contractDetails - Contract details with p1 and p2 values
+ * @param {Object} suppliesResult - Supplies result from API
  */
-function renderDashboard(data, addressInfo, cups, contractDetails) {
+function renderDashboard(data, addressInfo, cups, contractDetails, suppliesResult) {
   // Clear the login form and show the dashboard
   document.getElementById('login-container').style.display = 'none';
   const dashboardContainer = document.getElementById('dashboard-container');
   dashboardContainer.style.display = 'block';
-  
+
   // Render the consumption table with supply information
-  renderConsumptionTable(data, addressInfo, cups, contractDetails);
-  
+  renderConsumptionTable(data, addressInfo, cups, contractDetails, suppliesResult);
+
   // Check if header already exists before creating a new one
   if (!document.querySelector('.dashboard-header')) {
     // Create header with user and logout information
@@ -427,10 +429,10 @@ function renderDashboard(data, addressInfo, cups, contractDetails) {
         </div>
       </header>
     `;
-    
+
     // Insert header at the beginning of the body
     document.body.insertAdjacentHTML('afterbegin', headerHTML);
-    
+
     // Add event listener for logout
     document.getElementById('logoutBtn').addEventListener('click', logout);
   }
@@ -453,16 +455,17 @@ function formatNumberES(num, decimals = 2) {
  * @param {string} addressInfo - Address information for the supply
  * @param {string} cups - CUPS for the supply
  * @param {Object} contractDetails - Contract details with p1 and p2 values
+ * @param {Object} suppliesResult - Supplies result from API
  */
-function renderConsumptionTable(data, addressInfo = null, cups = null, contractDetails = null) {
+function renderConsumptionTable(data, addressInfo = null, cups = null, contractDetails = null, suppliesResult = null) {
   const container = document.getElementById('table-container');
-  
+
   // Debug logging
   console.log('Rendering consumption table with:');
   console.log('addressInfo:', addressInfo);
   console.log('cups:', cups);
   console.log('contractDetails:', contractDetails);
-  
+
   // Create supply information section
   const supplyInfoHTML = `
     <div class="supply-info-card">
@@ -470,6 +473,15 @@ function renderConsumptionTable(data, addressInfo = null, cups = null, contractD
         <h2>Información del Suministro</h2>
       </div>
       <div class="supply-info-content">
+      ${suppliesResult.multipleSupplies 
+      ? `
+<form action="" method="get">
+      <select name="cups" onchange="this.form.submit()">
+        ${suppliesResult.supplies.map(supply => `<option value="${supply.cups}" ${supply.cups === cups ? 'selected' : ''}>${supply.cups} (${supply.address})</option>`).join('')}
+      </select>
+</form>
+      `
+      : `
         <div class="supply-info-item">
           <span class="info-label">CUPS:</span>
           <span class="info-value">${cups || 'No disponible'}</span>
@@ -477,18 +489,19 @@ function renderConsumptionTable(data, addressInfo = null, cups = null, contractD
         <div class="supply-info-item">
           <span class="info-label">Dirección:</span>
           <span class="info-value">${addressInfo || 'No disponible'}</span>
-        </div>
+        </div>`
+  }
       </div>
     </div>
   `;
-  
+
   // Add supply info before the table
   container.innerHTML = supplyInfoHTML;
-  
-  
+
+
   // Extract monthly data from the processed data
   const { months, data: monthlyData } = data.summaries.byMonth;
-  
+
   // Format months as "Feb-23" style
   const formattedMonths = months.map(m => {
     const [year, month] = m.split('/');
@@ -551,10 +564,10 @@ function renderConsumptionTable(data, addressInfo = null, cups = null, contractD
       </tr>
     </table>
   `;
-  
+
   // Set the HTML to the container
   container.innerHTML += tableHTML;
-  
+
   // Add buttons to copy table data to clipboard
   addTableCopyButton(container);
 }
@@ -575,7 +588,7 @@ function addTableCopyButton(container) {
     const table = container.querySelector('table');
     copyTableToClipboard(table, 'all');
   });
-  
+
   // Create button for copying excedentes only
   const copyExcedentesButton = document.createElement('button');
   copyExcedentesButton.textContent = 'Copiar Excedentes';
@@ -584,16 +597,16 @@ function addTableCopyButton(container) {
     const table = container.querySelector('table');
     copyTableToClipboard(table, 'excedentes');
   });
-  
+
   const copyInfo = document.createElement('p');
   copyInfo.textContent = 'Copia facilmente los datos que necesitas usando los botones.';
   copyInfo.className = 'copy-info';
-  
+
   // Append buttons and info to the button container
   buttonContainer.appendChild(copyInfo);
   buttonContainer.appendChild(copyAllButton);
   buttonContainer.appendChild(copyExcedentesButton);
-  
+
   // Add buttons below the table
   container.appendChild(buttonContainer);
 }
@@ -607,15 +620,15 @@ function copyTableToClipboard(table, mode = 'all') {
   // Initialize variables
   const rows = table.rows;
   let csvContent = '';
-  
+
   // Find the rows to copy based on mode
   let rowsToProcess = [];
-  
+
   if (mode === 'excedentes') {
     // Find the excedentes row (usually the last row)
-    const excedentesRow = Array.from(rows).find(row => 
+    const excedentesRow = Array.from(rows).find(row =>
       row.querySelector('.row-label')?.textContent.includes('Excedentes'));
-    
+
     if (excedentesRow) {
       rowsToProcess = [excedentesRow];
     }
@@ -623,50 +636,50 @@ function copyTableToClipboard(table, mode = 'all') {
     // For 'all' mode, copy relevant rows (Descripción through Valle)
     const startRow = 1; // "Descripción" row
     const lastRow = 7;  // "Valle" row
-    
+
     rowsToProcess = Array.from(rows).slice(startRow, lastRow + 1);
   }
-  
+
   // Process each row to extract data
   rowsToProcess.forEach((row, index) => {
     const cells = row.cells;
     const rowData = [];
-    
+
     // Skip the first two columns (empty cell and row label)
     // Account for rowspan by checking the actual cell count
     const startIdx = cells.length > 13 ? 2 : 1;
-    
+
     for (let j = startIdx; j < cells.length; j++) {
       // Get the text content with Spanish number format
       rowData.push(cells[j].textContent.trim());
     }
-    
+
     csvContent += rowData.join('\t');
     if (index < rowsToProcess.length - 1) {
       csvContent += '\n'; // Add newline except for the last row
     }
   });
-  
+
   // Copy to clipboard
   navigator.clipboard.writeText(csvContent)
     .then(() => {
-      const message = mode === 'excedentes' ? 
+      const message = mode === 'excedentes' ?
         'Datos de excedentes copiados al portapapeles.\nPégalos en la celda D-16 del Excel de ElGrinchEnergetico!' :
         'Datos copiados al portapapeles.\nPégalos en la celda D-8 del Excel de ElGrinchEnergetico!';
       alert(message);
     })
     .catch(err => {
       console.error('Error al copiar: ', err);
-      
+
       // Fallback to the old method
       const textarea = document.createElement('textarea');
       textarea.value = csvContent;
       document.body.appendChild(textarea);
       textarea.select();
-      
+
       try {
         document.execCommand('copy');
-        const message = mode === 'excedentes' ? 
+        const message = mode === 'excedentes' ?
           'Datos de excedentes copiados al portapapeles!' :
           'Datos copiados al portapapeles!';
         alert(message);
@@ -674,7 +687,7 @@ function copyTableToClipboard(table, mode = 'all') {
         console.error('Error al copiar: ', fallbackErr);
         alert('No se pudo copiar. Intente copiar manualmente.');
       }
-      
+
       document.body.removeChild(textarea);
     });
 }
@@ -685,7 +698,7 @@ function copyTableToClipboard(table, mode = 'all') {
 function showLoginForm() {
   // Get the login container
   let loginContainer = document.getElementById('login-container');
-  
+
   // Always populate the login form content
   const loginFormHTML = `
     <div class="login-card">
@@ -693,7 +706,7 @@ function showLoginForm() {
       <p>Accede a tus datos de consumo usando tu cuenta de Datadis</p>
       <form id="loginForm">
         <div class="form-group">
-          <label for="username">Usuario (DNI)</label>
+          <label for="username">Usuario (DNI o CIF)</label>
           <input type="text" id="username" required placeholder="Introduce tu DNI/NIE" autocomplete="username">
         </div>
         <div class="form-group">
@@ -708,10 +721,10 @@ function showLoginForm() {
       </div>
     </div>
   `;
-  
+
   // Clear and populate the login container
   loginContainer.innerHTML = loginFormHTML;
-  
+
   // Make sure the dashboard container exists
   let dashboardContainer = document.getElementById('dashboard-container');
   if (!dashboardContainer) {
@@ -719,7 +732,7 @@ function showLoginForm() {
     document.body.insertAdjacentHTML('beforeend', '<div id="dashboard-container" style="display: none;"><div id="table-container"></div></div>');
     dashboardContainer = document.getElementById('dashboard-container');
   }
-  
+
   // Show login, hide dashboard
   loginContainer.style.display = 'flex';
   dashboardContainer.style.display = 'none';
@@ -742,7 +755,7 @@ function showDashboard(skipDataLoading = false) {
   const dashboardContainer = document.getElementById('dashboard-container');
   if (dashboardContainer) {
     dashboardContainer.style.display = 'block'; // Show the dashboard
-    
+
     // Only fetch data if explicitly requested and we're not already loading data
     if (!skipDataLoading) {
       // Check if we have an auth token to fetch fresh data
@@ -781,7 +794,7 @@ function showDashboard(skipDataLoading = false) {
 function showLoadingSpinner(message = 'Cargando tus datos...') {
   // Check if a spinner already exists
   let spinner = document.getElementById('loadingSpinner');
-  
+
   if (spinner) {
     // Update existing spinner message
     const messageElement = document.getElementById('loadingMessage');
@@ -826,7 +839,7 @@ function hideLoadingSpinner() {
 function showCacheNotification(cacheDate, addressInfo = '') {
   const formattedDate = cacheDate.toLocaleString();
   const addressDisplay = addressInfo ? `<p><strong>Suministro:</strong> ${addressInfo}</p>` : '';
-  
+
   const notificationHTML = `
     <div id="cacheNotification" class="notification">
       <div class="notification-content">
@@ -837,16 +850,16 @@ function showCacheNotification(cacheDate, addressInfo = '') {
       </div>
     </div>
   `;
-  
+
   // Remove any existing notification
   const existingNotification = document.getElementById('cacheNotification');
   if (existingNotification) {
     document.body.removeChild(existingNotification);
   }
-  
+
   // Add the notification to the body
   document.body.insertAdjacentHTML('beforeend', notificationHTML);
-  
+
   // Add event listener to close button
   document.getElementById('closeNotification').addEventListener('click', () => {
     const notification = document.getElementById('cacheNotification');
@@ -857,7 +870,7 @@ function showCacheNotification(cacheDate, addressInfo = '') {
       }, 500);
     }
   });
-  
+
   // Auto-hide after 10 seconds
   setTimeout(() => {
     const notification = document.getElementById('cacheNotification');
@@ -885,7 +898,7 @@ function showSupplySelectionModal(supplies, authToken) {
     if (existingOverlay) {
       document.body.removeChild(existingOverlay);
     }
-    
+
     // Create modal HTML structure
     const modalHTML = `
       <div class="modal-overlay">
@@ -908,10 +921,10 @@ function showSupplySelectionModal(supplies, authToken) {
         </div>
       </div>
     `;
-    
+
     // Insert modal into DOM
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
+
     // Add event listeners to all supply buttons
     document.querySelectorAll('.supply-item').forEach(button => {
       button.addEventListener('click', (event) => {
@@ -923,16 +936,16 @@ function showSupplySelectionModal(supplies, authToken) {
         const municipality = decodeURIComponent(button.getAttribute('data-municipality'));
         const postalCode = decodeURIComponent(button.getAttribute('data-postalcode'));
         const province = decodeURIComponent(button.getAttribute('data-province'));
-        
+
         // Remove modal
         const modalOverlay = document.querySelector('.modal-overlay');
         if (modalOverlay) {
           document.body.removeChild(modalOverlay);
         }
-        
+
         // Create formatted address string
         const addressInfo = `${address}, ${municipality}, ${postalCode}, ${province}`;
-        
+
         // Resolve with selected supply
         resolve({
           cups,
@@ -952,56 +965,61 @@ function showSupplySelectionModal(supplies, authToken) {
  */
 async function fetchFreshData(authToken, showSpinner = true) {
   console.log('Fetching data using auth token');
-  
+
   // Only show a new spinner if requested (not when called from login)
   if (showSpinner) {
     showLoadingSpinner();
   }
-  
+
   try {
     // Set date range based on configuration
     const endDate = new Date();
     const startDate = new Date();
     startDate.setMonth(startDate.getMonth() - CONFIG.monthsToFetch);
-    
+
     const measurementType = 0;
-    
+
     // API flow to get all the required data
     updateLoadingMessage('Obteniendo distribuidoras...');
     const distributorCode = await getDistributorsWithSupplies(authToken);
     console.log('Distributor code:', distributorCode);
-    
+
     // Get supplies and handle multiple supplies case
     updateLoadingMessage('Obteniendo puntos de suministro...');
     const suppliesResult = await getSuppliesData(authToken, distributorCode);
-    
+
     // If multiple supplies returned, show selection modal
     let supplyData;
     if (suppliesResult.multipleSupplies) {
-      hideLoadingSpinner(); // Hide spinner during selection
-      supplyData = await showSupplySelectionModal(suppliesResult.supplies, authToken);
-      // Create a new spinner after the modal is closed
-      showLoadingSpinner('Procesando suministro seleccionado...');
+      const urlParams = new URLSearchParams(document.location.search);
+      supplyData = urlParams.has('cups') ? suppliesResult.supplies.find(s => s.cups === urlParams.get('cups')) : null;
+
+      if (!supplyData) {
+        hideLoadingSpinner(); // Hide spinner during selection
+        supplyData = await showSupplySelectionModal(suppliesResult.supplies, authToken);
+        // Create a new spinner after the modal is closed
+        showLoadingSpinner('Procesando suministro seleccionado...');
+      }
     } else {
       supplyData = suppliesResult;
     }
-    
+
     console.log('Selected supply cups:', supplyData.cups);
     console.log('Selected supply addressInfo:', supplyData.addressInfo);
-    
+
     // Get contract details
     updateLoadingMessage('Obteniendo detalles del contrato...');
     const contractCacheKey = createContractCacheKey(supplyData.cups, supplyData.distributorCode);
     let contractDetails;
-    
+
     try {
       contractDetails = await getContractDetail(
-        authToken, 
-        supplyData.cups, 
+        authToken,
+        supplyData.cups,
         supplyData.distributorCode,
         supplyData.addressInfo
       );
-      
+
       // Cache contract details on successful API response
       setCache(contractCacheKey, contractDetails, 48); // 48 hours expiration
     } catch (error) {
@@ -1021,36 +1039,36 @@ async function fetchFreshData(authToken, showSpinner = true) {
         throw error;
       }
     }
-    
+
     console.log('Contratada P1:', contractDetails.p1);
     console.log('Contratada P2:', contractDetails.p2);
-    
+
     // Get consumption data
     updateLoadingMessage('Descargando datos de consumo (esto puede tardar unos segundos)...');
     const consumptionCacheKey = createConsumptionCacheKey(
-      supplyData.cups, 
-      startDate, 
-      endDate, 
-      measurementType, 
+      supplyData.cups,
+      startDate,
+      endDate,
+      measurementType,
       supplyData.pointType
     );
-    
+
     let consumptionData;
     let dataFromCache = false;
-    
+
     try {
       // Try to get data from API first
       const apiResponse = await getConsumptionData(
-        authToken, 
-        supplyData.cups, 
-        supplyData.distributorCode, 
-        startDate, 
+        authToken,
+        supplyData.cups,
+        supplyData.distributorCode,
+        startDate,
         endDate,
         measurementType,
         supplyData.pointType,
         supplyData.addressInfo
       );
-      
+
       // Cache successful API responses
       if (Array.isArray(apiResponse)) {
         setCache(consumptionCacheKey, apiResponse);
@@ -1080,22 +1098,22 @@ async function fetchFreshData(authToken, showSpinner = true) {
         throw error;
       }
     }
-    
+
     // If using cached data, show notification
     if (dataFromCache) {
       showCacheNotification(new Date(), supplyData.addressInfo);
     }
-    
+
     // Process the data and display on dashboard
     console.log('Processing consumption data, length:', consumptionData.length);
-    processAndDisplayData(consumptionData, contractDetails);
-    
+    processAndDisplayData(consumptionData, contractDetails, suppliesResult);
+
     // Show the dashboard when data is loaded but skip further data loading
     showDashboard(true); // Pass true to prevent recursive data loading
-    
+
   } catch (error) {
     console.error('Error fetching data:', error);
-    
+
     // Handle different error types
     if (error.message && (error.message.includes('authentication') || error.message.includes('401'))) {
       alert('Tu sesión ha expirado. Por favor, inicia sesión de nuevo.');
@@ -1134,13 +1152,13 @@ function setCache(key, data, expirationHours = 24) {
     localStorage.setItem(key, JSON.stringify(cacheItem));
   } catch (error) {
     // Check specifically for quota exceeded errors
-    if (error.name === 'QuotaExceededError' || 
+    if (error.name === 'QuotaExceededError' ||
         error.code === 22 || // Chrome/Firefox
         error.code === 1014 || // Firefox
         error.message?.includes('exceeded')) {
-      
+
       console.warn('Storage quota exceeded. Attempting to clear older cached items...');
-      
+
       // Try to clear some space by removing older cached items
       try {
         clearOldestCacheItems();
@@ -1160,7 +1178,7 @@ function setCache(key, data, expirationHours = 24) {
  */
 function clearOldestCacheItems() {
   const cacheKeys = [];
-  
+
   // Collect all cache keys and their timestamps
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
@@ -1173,13 +1191,13 @@ function clearOldestCacheItems() {
       // Skip non-JSON items
     }
   }
-  
+
   // Sort by timestamp (oldest first)
   cacheKeys.sort((a, b) => a.timestamp - b.timestamp);
-  
+
   // Remove the oldest 20% of items or at least 3 items
   const itemsToRemove = Math.max(3, Math.floor(cacheKeys.length * 0.2));
-  
+
   for (let i = 0; i < itemsToRemove && i < cacheKeys.length; i++) {
     localStorage.removeItem(cacheKeys[i].key);
     console.log(`Removed old cache item: ${cacheKeys[i].key}`);
@@ -1195,15 +1213,15 @@ function getCache(key) {
   try {
     const cachedItem = localStorage.getItem(key);
     if (!cachedItem) return null;
-    
+
     const parsedItem = JSON.parse(cachedItem);
-    
+
     // Check if cache has expired
     if (parsedItem.expires && parsedItem.expires < Date.now()) {
       localStorage.removeItem(key); // Clean up expired cache
       return null;
     }
-    
+
     return parsedItem.data;
   } catch (error) {
     console.warn(`Failed to retrieve cache for key ${key}:`, error);
