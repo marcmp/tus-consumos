@@ -384,7 +384,7 @@ async function handleLoginFormSubmission(form) {
  * @param {Object} contractDetails - Contract details with p1 and p2 values
  * @param {Object} suppliesResult - Supplies result from API
  */
-function processAndDisplayData(data, contractDetails) {
+function processAndDisplayData(data, contractDetails, suppliesResult) {
   // Only process the data once
   const processedData = processConsumptionData(data);
 
@@ -395,7 +395,7 @@ function processAndDisplayData(data, contractDetails) {
   const addressInfo = contractDetails.addressInfo || 'No disponible';
 
   // Pass the processed data to the dashboard renderer with CUPS and address
-  renderDashboard(processedData, addressInfo, cups, contractDetails);
+  renderDashboard(processedData, addressInfo, cups, contractDetails, suppliesResult);
 }
 
 /**
@@ -406,14 +406,14 @@ function processAndDisplayData(data, contractDetails) {
  * @param {Object} contractDetails - Contract details with p1 and p2 values
  * @param {Object} suppliesResult - Supplies result from API
  */
-function renderDashboard(data, addressInfo, cups, contractDetails) {
+function renderDashboard(data, addressInfo, cups, contractDetails, suppliesResult) {
   // Clear the login form and show the dashboard
   document.getElementById('login-container').style.display = 'none';
   const dashboardContainer = document.getElementById('dashboard-container');
   dashboardContainer.style.display = 'block';
 
   // Render the consumption table with supply information
-  renderConsumptionTable(data, addressInfo, cups, contractDetails);
+  renderConsumptionTable(data, addressInfo, cups, contractDetails, suppliesResult);
 
   // Check if header already exists before creating a new one
   if (!document.querySelector('.dashboard-header')) {
@@ -457,7 +457,7 @@ function formatNumberES(num, decimals = 2) {
  * @param {Object} contractDetails - Contract details with p1 and p2 values
  * @param {Object} suppliesResult - Supplies result from API
  */
-function renderConsumptionTable(data, addressInfo = null, cups = null, contractDetails = null) {
+function renderConsumptionTable(data, addressInfo = null, cups = null, contractDetails = null, suppliesResult = null) {
   const container = document.getElementById('table-container');
 
   // Debug logging
@@ -489,18 +489,19 @@ function renderConsumptionTable(data, addressInfo = null, cups = null, contractD
         <div class="supply-info-item">
           <span class="info-label">Dirección:</span>
           <span class="info-value">${addressInfo || 'No disponible'}</span>
-        </div>
+        </div>`
+  }
       </div>
     </div>
   `;
-  
+
   // Add supply info before the table
   container.innerHTML = supplyInfoHTML;
-  
-  
+
+
   // Extract monthly data from the processed data
   const { months, data: monthlyData } = data.summaries.byMonth;
-  
+
   // Format months as "Feb-23" style
   const formattedMonths = months.map(m => {
     const [year, month] = m.split('/');
@@ -563,10 +564,10 @@ function renderConsumptionTable(data, addressInfo = null, cups = null, contractD
       </tr>
     </table>
   `;
-  
+
   // Set the HTML to the container
   container.innerHTML += tableHTML;
-  
+
   // Add buttons to copy table data to clipboard
   addTableCopyButton(container);
 }
@@ -587,7 +588,7 @@ function addTableCopyButton(container) {
     const table = container.querySelector('table');
     copyTableToClipboard(table, 'all');
   });
-  
+
   // Create button for copying excedentes only
   const copyExcedentesButton = document.createElement('button');
   copyExcedentesButton.textContent = 'Copiar Excedentes';
@@ -596,16 +597,16 @@ function addTableCopyButton(container) {
     const table = container.querySelector('table');
     copyTableToClipboard(table, 'excedentes');
   });
-  
+
   const copyInfo = document.createElement('p');
   copyInfo.textContent = 'Copia facilmente los datos que necesitas usando los botones.';
   copyInfo.className = 'copy-info';
-  
+
   // Append buttons and info to the button container
   buttonContainer.appendChild(copyInfo);
   buttonContainer.appendChild(copyAllButton);
   buttonContainer.appendChild(copyExcedentesButton);
-  
+
   // Add buttons below the table
   container.appendChild(buttonContainer);
 }
@@ -619,15 +620,15 @@ function copyTableToClipboard(table, mode = 'all') {
   // Initialize variables
   const rows = table.rows;
   let csvContent = '';
-  
+
   // Find the rows to copy based on mode
   let rowsToProcess = [];
-  
+
   if (mode === 'excedentes') {
     // Find the excedentes row (usually the last row)
-    const excedentesRow = Array.from(rows).find(row => 
+    const excedentesRow = Array.from(rows).find(row =>
       row.querySelector('.row-label')?.textContent.includes('Excedentes'));
-    
+
     if (excedentesRow) {
       rowsToProcess = [excedentesRow];
     }
@@ -635,50 +636,50 @@ function copyTableToClipboard(table, mode = 'all') {
     // For 'all' mode, copy relevant rows (Descripción through Valle)
     const startRow = 1; // "Descripción" row
     const lastRow = 7;  // "Valle" row
-    
+
     rowsToProcess = Array.from(rows).slice(startRow, lastRow + 1);
   }
-  
+
   // Process each row to extract data
   rowsToProcess.forEach((row, index) => {
     const cells = row.cells;
     const rowData = [];
-    
+
     // Skip the first two columns (empty cell and row label)
     // Account for rowspan by checking the actual cell count
     const startIdx = cells.length > 13 ? 2 : 1;
-    
+
     for (let j = startIdx; j < cells.length; j++) {
       // Get the text content with Spanish number format
       rowData.push(cells[j].textContent.trim());
     }
-    
+
     csvContent += rowData.join('\t');
     if (index < rowsToProcess.length - 1) {
       csvContent += '\n'; // Add newline except for the last row
     }
   });
-  
+
   // Copy to clipboard
   navigator.clipboard.writeText(csvContent)
     .then(() => {
-      const message = mode === 'excedentes' ? 
+      const message = mode === 'excedentes' ?
         'Datos de excedentes copiados al portapapeles.\nPégalos en la celda D-16 del Excel de ElGrinchEnergetico!' :
         'Datos copiados al portapapeles.\nPégalos en la celda D-8 del Excel de ElGrinchEnergetico!';
       alert(message);
     })
     .catch(err => {
       console.error('Error al copiar: ', err);
-      
+
       // Fallback to the old method
       const textarea = document.createElement('textarea');
       textarea.value = csvContent;
       document.body.appendChild(textarea);
       textarea.select();
-      
+
       try {
         document.execCommand('copy');
-        const message = mode === 'excedentes' ? 
+        const message = mode === 'excedentes' ?
           'Datos de excedentes copiados al portapapeles!' :
           'Datos copiados al portapapeles!';
         alert(message);
@@ -686,7 +687,7 @@ function copyTableToClipboard(table, mode = 'all') {
         console.error('Error al copiar: ', fallbackErr);
         alert('No se pudo copiar. Intente copiar manualmente.');
       }
-      
+
       document.body.removeChild(textarea);
     });
 }
@@ -697,7 +698,7 @@ function copyTableToClipboard(table, mode = 'all') {
 function showLoginForm() {
   // Get the login container
   let loginContainer = document.getElementById('login-container');
-  
+
   // Always populate the login form content
   const loginFormHTML = `
     <div class="login-card">
@@ -705,7 +706,7 @@ function showLoginForm() {
       <p>Accede a tus datos de consumo usando tu cuenta de Datadis</p>
       <form id="loginForm">
         <div class="form-group">
-          <label for="username">Usuario (DNI)</label>
+          <label for="username">Usuario (DNI o CIF)</label>
           <input type="text" id="username" required placeholder="Introduce tu DNI/NIE" autocomplete="username">
         </div>
         <div class="form-group">
@@ -1105,7 +1106,7 @@ async function fetchFreshData(authToken, showSpinner = true) {
 
     // Process the data and display on dashboard
     console.log('Processing consumption data, length:', consumptionData.length);
-    processAndDisplayData(consumptionData, contractDetails);
+    processAndDisplayData(consumptionData, contractDetails, suppliesResult);
 
     // Show the dashboard when data is loaded but skip further data loading
     showDashboard(true); // Pass true to prevent recursive data loading
