@@ -10,9 +10,8 @@
     "mock-server": "node mock/server.js"
   },
   "devDependencies": {
-    "jest": "^29.7.0"
-  },
-  "dependencies": {
+    "jest": "^29.7.0",
+    "http-server": "^14.1.1",
     "json-server": "^0.17.4"
   }
 }
