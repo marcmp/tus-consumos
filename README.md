@@ -8,7 +8,8 @@ Tus Consumos is a client-side web application that uses the Datadis APIs to retr
 
 This tool can be used as a companion app to "El Grinch Energetico" Excel spreadsheet to help you find the best energy price option in Spain based on your consumption habits.
 
-Privacy is and should be a first-class citizen in this project. The tool only makes network calls to Datadis servers and GoatCounter, an open-source and GDPR-compliant analytics script used to track page usage.
+Privacy is and should be a first-class citizen in this project. The tool only makes network calls to Datadis servers and GoatCounter, an open-source and GDPR-compliant
+analytics script used to track page usage.
 
 **Why Datadis?**  Datadis provides a single API to communicate to every energy distributor in Spain.
 
@@ -31,16 +32,15 @@ Privacy is and should be a first-class citizen in this project. The tool only ma
 
 **Don't know how to use the ElGrinchEnergético Excel spreadsheet?** Then, watch his instructions in video [here](https://grinchenergetico.com/comparador-de-tarifas/).
 
-
 ## Installation (prod-environment or local)
 
 Just copy the strictly necessary files to your http server
-	```
-	index.html
-   style.css
-	script.js
-   apiCalls.js
-	```
+```
+index.html
+style.css
+script.js
+apiCalls.js
+```
 
 Please, remember to follow the License rules below.
 
@@ -58,9 +58,9 @@ Please, remember to follow the License rules below.
    ```
 
 3. Run the server
-	```bash
-   http-server
-   ```
+   ```bash
+  http-server
+  ```
 
 ## Mock Server
 
@@ -111,10 +111,10 @@ We welcome contributions to TusConsumos! Whether it's bug reports, feature sugge
 
 Please, check out the [CONTRIBUTING.md](CONTRIBUTING.md) file for detailed guidelines.
 
-
 ## License
 
-This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). Users who interact with this software over a network have the right to receive a copy of the 
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). Users who interact with this software over a network have the right to receive a copy of
+the
 corresponding source code.
 
 For more information about your rights, see the LICENSE file or visit https://www.gnu.org/licenses/agpl-3.0.en.html

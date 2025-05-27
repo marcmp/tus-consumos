@@ -1,4 +1,4 @@
-import { authorizeApiCall, getDistributorsWithSupplies, getSuppliesData, getContractDetail, getConsumptionData, checkAuth, logout, formatDate } from './apiCalls.js';
+import {authorizeApiCall, getDistributorsWithSupplies, getSuppliesData, getContractDetail, getConsumptionData, checkAuth, logout, formatDate } from './apiCalls.js';
 
 
 /**
@@ -473,7 +473,7 @@ function renderConsumptionTable(data, addressInfo = null, cups = null, contractD
         <h2>Información del Suministro</h2>
       </div>
       <div class="supply-info-content">
-      ${suppliesResult.multipleSupplies 
+      ${suppliesResult.multipleSupplies
       ? `
 <form action="" method="get">
       <select name="cups" onchange="this.form.submit()">
@@ -907,8 +907,8 @@ function showSupplySelectionModal(supplies, authToken) {
           <p>Se han encontrado varios suministros. Por favor, selecciona uno:</p>
           <div class="supply-list">
             ${supplies.map(supply => `
-              <button class="supply-item" data-cups="${supply.cups}" 
-                data-pointtype="${supply.pointType}" 
+              <button class="supply-item" data-cups="${supply.cups}"
+                data-pointtype="${supply.pointType}"
                 data-distributorcode="${supply.distributorCode}"
                 data-address="${encodeURIComponent(supply.address)}"
                 data-municipality="${encodeURIComponent(supply.municipality)}"
