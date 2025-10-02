@@ -21,7 +21,8 @@ There are many ways to contribute to TusConsumos:
 1. **Fork the Repository**: Create your own fork of the project.
 2. **Create a Branch**: Create a branch in your fork for your contribution.
 3. **Make Changes**: Make your changes or additions to the new branch.
-4. **Test**: Test your changes to ensure they work as expected and don't break existing functionality.
+4. **Test**: All tests should pass (`npm test`)
+5. **Linter:** Code passes linting (`npx eslint .`)
 5. **Submit a Pull Request**: Submit a pull request from your branch to our main repository.
 
 ## Development Setup
@@ -33,7 +34,6 @@ Follow the installation instructions in the README.md file to set up your develo
 - Follow the existing code style in the project.
 - Although the UI is in Spanish, but the code should be Enlish.
 - Write clear, commented, and concise code.
-- Make sure your code doesn't generate new warnings or errors.
 - Whenever possible, include appropriate tests for your changes.
 
 You may use your preferred language (Catalan, Spanish, English...) in issues, bug reports, etc. However, the source code should be kept in English only.

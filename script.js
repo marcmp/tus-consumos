@@ -1,4 +1,5 @@
 import { authorizeApiCall, getDistributorsWithSupplies, getSuppliesData, getContractDetail, getConsumptionData, checkAuth, logout, formatDate } from './apiCalls.js';
+import { getPeriod } from './period.js';
 
 
 /**
@@ -18,53 +19,7 @@ const CONFIG = {
  * ==================
  */
 
-// Spanish national holidays (format MM/DD) - Only includes holidays that are fixed in the calendar
-const nationalFestivities = [
-    "01/01", // Año Nuevo
-    "01/06", // Epifanía del Señor
-    "03/29", // Viernes Santo
-    "05/01", // Fiesta del trabajo
-    "08/15", // Asunción de la Virgen
-    "10/12", // Fiesta Nacional de España
-    "11/01", // Todos los Santos
-    "12/06", // Día de la Constitución Española
-    "12/25"  // Natividad del Señor
-];
-
-// Mapping of hours to period types
-const hourToPeriodMap = {
-  0: 'P3', 1: 'P3', 2: 'P3', 3: 'P3', 4: 'P3', 5: 'P3', 6: 'P3', 7: 'P3', 8: 'P3',
-  9: 'P2', 10: 'P2',
-  11: 'P1', 12: 'P1', 13: 'P1', 14: 'P1',
-  15: 'P2', 16: 'P2', 17: 'P2', 18: 'P2',
-  19: 'P1', 20: 'P1', 21: 'P1', 22: 'P1',
-  23: 'P2', 24: 'P2'
-};
-
-/**
- * Determines the energy price period based on date and time
- * @param {string} date - Date in format YYYY/MM/DD
- * @param {string} time - Time in format HH:MM
- * @returns {string} Period code: P1, P2, or P3
- */
-export function getPeriod(date, time) {
-  // Check for national holidays
-  const [year, month, day] = date.split("/");
-  const monthDay = `${month}/${day}`;
-  if (nationalFestivities.includes(monthDay)) {
-    return 'P3';
-  }
-  
-  // Check for weekends
-  const dayOfWeek = new Date(date).getDay();
-  if (dayOfWeek === 0 || dayOfWeek === 6) {
-    return 'P3';
-  }
-  
-  // Check time period
-  const hour = parseInt(time.split(':')[0], 10);
-  return hourToPeriodMap[hour] || 'P3';
-}
+// getPeriod is imported from './period.js'
 
 /**
  * DATA PROCESSING FUNCTIONS
@@ -342,7 +297,7 @@ async function handleFormSubmissions(event) {
  * Handle login form submission
  * @param {HTMLFormElement} form - Login form
  */
-async function handleLoginFormSubmission(form) {
+async function handleLoginFormSubmission() {
   const username = document.getElementById('username').value;
   const password = document.getElementById('password').value;
   
@@ -878,7 +833,7 @@ function showCacheNotification(cacheDate, addressInfo = '') {
  * @param {string} authToken - Authorization token
  * @returns {Promise<Object>} - Selected supply data
  */
-function showSupplySelectionModal(supplies, authToken) {
+function showSupplySelectionModal(supplies) {
   return new Promise((resolve) => {
     // First, remove any existing modal overlays
     const existingOverlay = document.querySelector('.modal-overlay');
@@ -914,7 +869,7 @@ function showSupplySelectionModal(supplies, authToken) {
     
     // Add event listeners to all supply buttons
     document.querySelectorAll('.supply-item').forEach(button => {
-      button.addEventListener('click', (event) => {
+      button.addEventListener('click', () => {
         // Get supply data from button attributes
         const cups = button.getAttribute('data-cups');
         const pointType = button.getAttribute('data-pointtype');
@@ -1169,7 +1124,7 @@ function clearOldestCacheItems() {
       if (item && item.timestamp) {
         cacheKeys.push({ key, timestamp: item.timestamp });
       }
-    } catch (e) {
+    } catch {
       // Skip non-JSON items
     }
   }
@@ -1239,6 +1194,7 @@ function createContractCacheKey(cups, distributorCode) {
 
 // Export functions needed for testing or external use
 export {
+  getPeriod,
   enrichData,
   buildMonthlySummary,
   calculateTotalConsumption,

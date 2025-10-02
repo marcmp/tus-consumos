@@ -1,3 +1,5 @@
+import { getPeriod } from './period.js';
+
 /**
  * API CONNFIGURATION
  * ================
@@ -80,7 +82,10 @@ async function makeApiCall(endpoint, options = {}) {
           return await errorHandler.handleError(error, endpoint, context);
         } catch (handlerError) {
           // If the error handler also throws, propagate that error
-          throw handlerError;
+          throw Error(
+            `Error handling API error: ${handlerError.message}`,
+            { cause: handlerError }
+          );
         }
       }
       
@@ -260,7 +265,10 @@ async function getContractDetail(authToken, cups, distributorCode, addressInfo =
       };
     } catch (error) {
       // Just rethrow errors for the UI layer to handle
-      throw error;
+      throw new Error(
+        `Error getting contract detail: ${error.message}`,
+        { cause: error }
+      );
     }
 }
 
@@ -303,18 +311,16 @@ async function getConsumptionData(authToken, cups, distributorCode, startDate, e
     
     // Process the timeCurve data from a regular API response
     const timeCurve = result.timeCurve;
-    
-    if (typeof getPeriod === 'function') {
       return timeCurve.map(entry => ({
         ...entry,
         period: getPeriod(entry.date, entry.time)
       }));
-    }
-    
-    return timeCurve;
   } catch (error) {
     // Just rethrow errors for the UI layer to handle
-    throw error;
+    throw new Error(
+      `Error getting consumption data: ${error.message}`,
+      { cause: error }
+    );
   }
 }
 
@@ -361,7 +367,11 @@ class ApiErrorHandler {
    * @returns {Promise<never>} - Always throws the error, but with a more informative message
    */
   async handleRateLimitError(error, endpoint, context) {
-    console.warn('Rate limit exceeded for API.');
+    console.error('Rate limit exceeded for API:', {
+      endpoint,
+      context,
+      message: error?.message || String(error),
+    });
     
     // Rethrow with a clearer message for the UI layer to handle
     throw new Error('Rate limit exceeded for the API. Please try again later.');
@@ -375,7 +385,11 @@ class ApiErrorHandler {
    * @returns {Promise<never>} - Always throws, but may perform UI actions first
    */
   async handleAuthError(error, endpoint, context) {
-    console.error('Authentication error when calling API:', endpoint);
+    console.error('Authentication error when calling API:', {
+      endpoint,
+      context,
+      message: error?.message || String(error),
+    });
     
     // Clear session storage
     sessionStorage.removeItem('isLoggedIn');
@@ -393,10 +407,14 @@ class ApiErrorHandler {
    * @returns {Promise<never>} - Always throws, but with a more informative message
    */
   async handleNetworkError(error, endpoint, context) {
-    console.error('Network error when calling API:', endpoint);
-    
-    // Throw with a clearer message
-    throw new Error('A network error occurred. Please check your internet connection and try again.');
+    console.error('Network error when calling API:', {
+      endpoint,
+      context,
+      message: error?.message || String(error),
+    });
+  
+    // Re-throw with context while preserving the original error
+    throw new Error(`Network error calling ${endpoint}`, { cause: error });
   }
 }
 

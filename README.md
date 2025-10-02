@@ -35,7 +35,7 @@ Privacy is and should be a first-class citizen in this project. The tool only ma
 ## Installation (prod-environment or local)
 
 Just copy the strictly necessary files to your http server
-	```
+	```bash
 	index.html
    style.css
 	script.js
@@ -82,7 +82,7 @@ You can test error scenarios by changing response status codes. Simply edit the 
 
 The mock server uses JSON files in the `/mock/data` directory:
 
-```
+```text
 mock/data/
   ├── nikola-auth/
   │   └── tokens/
