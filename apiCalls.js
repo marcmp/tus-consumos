@@ -6,7 +6,7 @@ import { getPeriod } from './period.js';
  */
 
 const apiConfig = {
-  useMockServer: false, // True to use a mock server instead the real API server
+  useMockServer: false, // true to use a mock server instead the real API server. Use false for the real API server and production.
   mockServerBaseUrl: 'http://localhost:8088'
 };
 
