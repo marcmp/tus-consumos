@@ -521,33 +521,86 @@ function renderConsumptionTable(data, addressInfo = null, cups = null, contractD
 function addTableCopyButton(container) {
   // Create a container for the buttons
   const buttonContainer = document.createElement('div');
+  buttonContainer.className = 'copy-actions';
+
+  const createActionButton = ({ title, subtitle, buttonClass, icon, onClick }) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `copy-btn ${buttonClass}`;
+    button.innerHTML = `
+      <span class="copy-btn-icon" aria-hidden="true">${icon}</span>
+      <span class="copy-btn-text">
+        <span class="copy-btn-title">${title}</span>
+        <span class="copy-btn-subtitle">${subtitle}</span>
+      </span>
+    `;
+
+    if (onClick) {
+      button.addEventListener('click', onClick);
+    }
+
+    return button;
+  };
+
+  const excelIcon = `
+    <svg viewBox="0 0 24 24" focusable="false">
+      <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/>
+      <path d="M14 2v5h5"/>
+      <path d="m9 10 2 3-2 3m5-6-2 3 2 3"/>
+    </svg>
+  `;
+
+  const webIcon = `
+    <svg viewBox="0 0 24 24" focusable="false">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>
+    </svg>
+  `;
 
   // Create button for copying all data
-  const copyAllButton = document.createElement('button');
-  copyAllButton.textContent = 'Copiar Potencias y Energía';
-  copyAllButton.className = 'copy-btn copy-all-btn';
-  copyAllButton.addEventListener('click', () => {
-    const table = container.querySelector('table');
-    copyTableToClipboard(table, 'all');
+  const copyAllButton = createActionButton({
+    title: 'Copiar Potencias y Energía',
+    subtitle: 'Simulador Excel',
+    buttonClass: 'copy-all-btn',
+    icon: excelIcon,
+    onClick: () => {
+      const table = container.querySelector('table');
+      copyTableToClipboard(table, 'all');
+    }
   });
-  
+
   // Create button for copying excedentes only
-  const copyExcedentesButton = document.createElement('button');
-  copyExcedentesButton.textContent = 'Copiar Excedentes';
-  copyExcedentesButton.className = 'copy-btn copy-excedentes-btn';
-  copyExcedentesButton.addEventListener('click', () => {
-    const table = container.querySelector('table');
-    copyTableToClipboard(table, 'excedentes');
+  const copyExcedentesButton = createActionButton({
+    title: 'Copiar Excedentes',
+    subtitle: 'Simulador Excel',
+    buttonClass: 'copy-excedentes-btn',
+    icon: excelIcon,
+    onClick: () => {
+      const table = container.querySelector('table');
+      copyTableToClipboard(table, 'excedentes');
+    }
   });
+
+  // Placeholder button for web comparator (to be connected later)
+  const copyWebButton = createActionButton({
+    title: 'Copiar Todo',
+    subtitle: 'Comparador Web',
+    buttonClass: 'copy-web-btn',
+    icon: webIcon
+  });
+
+  copyWebButton.title = 'Próximamente';
+  copyWebButton.setAttribute('aria-label', 'Copiar Todo para Comparador Web (próximamente)');
   
   const copyInfo = document.createElement('p');
-  copyInfo.textContent = 'Copia facilmente los datos que necesitas usando los botones.';
+  copyInfo.textContent = 'Copia los datos para pegarlos en los Simuladores de Tarifas de Carlos Codina';
   copyInfo.className = 'copy-info';
   
   // Append buttons and info to the button container
   buttonContainer.appendChild(copyInfo);
   buttonContainer.appendChild(copyAllButton);
   buttonContainer.appendChild(copyExcedentesButton);
+  buttonContainer.appendChild(copyWebButton);
   
   // Add buttons below the table
   container.appendChild(buttonContainer);

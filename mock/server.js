@@ -32,7 +32,7 @@ const routeConfig = {
   [routes.distributors]: 200,
   [routes.supplies]: 200,
   [routes.contract]: 200,
-  [routes.consumption]: 429
+  [routes.consumption]: 200 // 429
 };
 
 // Error messages for each status code
