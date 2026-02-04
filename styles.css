@@ -464,7 +464,8 @@ h1, h2, h3, h4, h5, h6 {
 .copy-btn {
     border: none;
     border-radius: 6px;
-    padding: 14px;
+    padding: 10px 14px;
+    min-width: 250px;
     font-size: 16px;
     font-weight: 500;
     cursor: pointer;
@@ -472,7 +473,11 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     margin-right: 10px;
     margin-bottom: 10px;
-    text-align: center;
+    text-align: left;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    line-height: 1.2;
 }
 
 .copy-btn:hover {
@@ -503,11 +508,67 @@ h1, h2, h3, h4, h5, h6 {
     background: linear-gradient(135deg, #4CAF50, #6ECF70);
 }
 
+.copy-web-btn {
+    background: linear-gradient(135deg, #7db7e8, #4a90e2);
+    color: #0b2b4c;
+}
+
+.copy-web-btn:hover {
+    background: linear-gradient(135deg, #4a90e2, #7db7e8);
+}
+
+.copy-actions {
+    margin-top: 8px;
+}
+
+.copy-btn-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.45);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.copy-btn-icon svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.copy-btn-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.copy-btn-title {
+    font-weight: 700;
+}
+
+.copy-btn-subtitle {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
 .copy-info {
     margin-top: 10px;
     font-size: 13px;
     color: #666;
     font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .copy-btn {
+        width: 100%;
+        min-width: 0;
+        margin-right: 0;
+    }
 }
 
 /* =======================================

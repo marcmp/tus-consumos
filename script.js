@@ -521,36 +521,241 @@ function renderConsumptionTable(data, addressInfo = null, cups = null, contractD
 function addTableCopyButton(container) {
   // Create a container for the buttons
   const buttonContainer = document.createElement('div');
+  buttonContainer.className = 'copy-actions';
+
+  const createActionButton = ({ title, subtitle, buttonClass, icon, onClick }) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `copy-btn ${buttonClass}`;
+    button.innerHTML = `
+      <span class="copy-btn-icon" aria-hidden="true">${icon}</span>
+      <span class="copy-btn-text">
+        <span class="copy-btn-title">${title}</span>
+        <span class="copy-btn-subtitle">${subtitle}</span>
+      </span>
+    `;
+
+    if (onClick) {
+      button.addEventListener('click', onClick);
+    }
+
+    return button;
+  };
+
+  const excelIcon = `
+    <svg viewBox="0 0 24 24" focusable="false">
+      <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/>
+      <path d="M14 2v5h5"/>
+      <path d="m9 10 2 3-2 3m5-6-2 3 2 3"/>
+    </svg>
+  `;
+
+  const webIcon = `
+    <svg viewBox="0 0 24 24" focusable="false">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>
+    </svg>
+  `;
 
   // Create button for copying all data
-  const copyAllButton = document.createElement('button');
-  copyAllButton.textContent = 'Copiar Potencias y Energía';
-  copyAllButton.className = 'copy-btn copy-all-btn';
-  copyAllButton.addEventListener('click', () => {
-    const table = container.querySelector('table');
-    copyTableToClipboard(table, 'all');
+  const copyAllButton = createActionButton({
+    title: 'Copiar Potencias y Energía',
+    subtitle: 'Simulador Excel',
+    buttonClass: 'copy-all-btn',
+    icon: excelIcon,
+    onClick: () => {
+      const table = container.querySelector('table');
+      copyTableToClipboard(table, 'all');
+    }
   });
-  
+
   // Create button for copying excedentes only
-  const copyExcedentesButton = document.createElement('button');
-  copyExcedentesButton.textContent = 'Copiar Excedentes';
-  copyExcedentesButton.className = 'copy-btn copy-excedentes-btn';
-  copyExcedentesButton.addEventListener('click', () => {
-    const table = container.querySelector('table');
-    copyTableToClipboard(table, 'excedentes');
+  const copyExcedentesButton = createActionButton({
+    title: 'Copiar Excedentes',
+    subtitle: 'Simulador Excel',
+    buttonClass: 'copy-excedentes-btn',
+    icon: excelIcon,
+    onClick: () => {
+      const table = container.querySelector('table');
+      copyTableToClipboard(table, 'excedentes');
+    }
   });
+
+  // Create button for creating a the full URL to the Web comparator and copying it to the clipboard
+  const copyWebButton = createActionButton({
+    title: 'Copiar URL',
+    subtitle: 'Comparador Web',
+    buttonClass: 'copy-web-btn',
+    icon: webIcon,
+    onClick: () => {
+      const table = container.querySelector('table');
+      copyWebComparatorUrlToClipboard(table);
+    }
+  });
+  copyWebButton.setAttribute('aria-label', 'Copiar Todo para Comparador Web');
   
   const copyInfo = document.createElement('p');
-  copyInfo.textContent = 'Copia facilmente los datos que necesitas usando los botones.';
+  copyInfo.textContent = 'Copia los datos para pegarlos en los Simuladores de Tarifas de Carlos Codina';
   copyInfo.className = 'copy-info';
   
   // Append buttons and info to the button container
   buttonContainer.appendChild(copyInfo);
   buttonContainer.appendChild(copyAllButton);
   buttonContainer.appendChild(copyExcedentesButton);
+  buttonContainer.appendChild(copyWebButton);
   
   // Add buttons below the table
   container.appendChild(buttonContainer);
+}
+
+/**
+ * Copy plain text to clipboard
+ * @param {string} text - Content to copy
+ * @param {string} successMessage - Message shown when copy succeeds
+ */
+function copyTextToClipboard(text, successMessage) {
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      alert(successMessage);
+    })
+    .catch(err => {
+      console.error('Error al copiar: ', err);
+
+      // Fallback method for older browsers
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+
+      try {
+        document.execCommand('copy');
+        alert(successMessage);
+      } catch (fallbackErr) {
+        console.error('Error al copiar: ', fallbackErr);
+        alert('No se pudo copiar. Intente copiar manualmente.');
+      }
+
+      document.body.removeChild(textarea);
+    });
+}
+
+/**
+ * Parse a Spanish-formatted number (e.g. "1.234,56")
+ * @param {string} value - Text value to parse
+ * @returns {number} Parsed number
+ */
+function parseSpanishNumber(value) {
+  if (!value) return 0;
+  const normalizedValue = value
+    .replace(/\./g, '')
+    .replace(',', '.')
+    .replace(/[^\d.-]/g, '');
+  const parsedValue = Number(normalizedValue);
+  return Number.isFinite(parsedValue) ? parsedValue : 0;
+}
+
+/**
+ * Format a number for URL params using dot as decimal separator
+ * @param {number} value - Number to format
+ * @param {number} decimals - Maximum decimal places
+ * @returns {string} Formatted number
+ */
+function formatNumberForUrl(value, decimals = 2) {
+  return Number(value.toFixed(decimals)).toString();
+}
+
+/**
+ * Get data values from a table row, skipping header cells
+ * @param {HTMLTableRowElement} row - Table row element
+ * @returns {string[]} Data cell text values
+ */
+function getRowDataValues(row) {
+  if (!row) return [];
+  const cells = Array.from(row.cells);
+  const startIdx = cells.length > 13 ? 2 : 1;
+  return cells.slice(startIdx).map(cell => cell.textContent.trim());
+}
+
+/**
+ * Find a table row by label and optional row class
+ * @param {HTMLTableElement} table - Table element
+ * @param {string} label - Row label text to match
+ * @param {string|null} requiredClass - Optional class constraint
+ * @returns {HTMLTableRowElement|undefined} Matching row
+ */
+function findTableRow(table, label, requiredClass = null) {
+  return Array.from(table.rows).find(row => {
+    const rowLabel = row.querySelector('.row-label')?.textContent.trim();
+    if (rowLabel !== label) return false;
+    return requiredClass ? row.classList.contains(requiredClass) : true;
+  });
+}
+
+/**
+ * Build comparator URL from current table values
+ * @param {HTMLTableElement} table - The source table
+ * @returns {string|null} Comparator URL or null on missing data
+ */
+function buildComparatorUrl(table) {
+  if (!table) return null;
+
+  const daysRow = findTableRow(table, 'Días');
+  const powerPuntaRow = findTableRow(table, 'Punta', 'power-row');
+  const powerValleRow = findTableRow(table, 'Valle', 'power-row');
+  const energyPuntaRow = findTableRow(table, 'Punta', 'consumption-row');
+  const energyLlanaRow = findTableRow(table, 'Llana', 'consumption-row');
+  const energyValleRow = findTableRow(table, 'Valle', 'consumption-row');
+  const excedentesRow = findTableRow(table, 'Excedentes (kWh)', 'excedentes-row');
+
+  if (!daysRow || !powerPuntaRow || !powerValleRow || !energyPuntaRow || !energyLlanaRow || !energyValleRow || !excedentesRow) {
+    return null;
+  }
+
+  const sumRow = row => getRowDataValues(row).reduce((total, value) => total + parseSpanishNumber(value), 0);
+  const getLastValue = row => {
+    const rowValues = getRowDataValues(row);
+    const lastValue = rowValues[rowValues.length - 1];
+    return parseSpanishNumber(lastValue);
+  };
+
+  const dias = Math.round(sumRow(daysRow));
+  const pP1 = getLastValue(powerPuntaRow);
+  const pP2 = getLastValue(powerValleRow);
+  const cfP1 = sumRow(energyPuntaRow);
+  const cfP2 = sumRow(energyLlanaRow);
+  const cfP3 = sumRow(energyValleRow);
+  const excedentes = sumRow(excedentesRow);
+  const conExcedentes = excedentes > 0 ? 1 : 0;
+
+  const params = new URLSearchParams();
+  params.append('dias', String(dias));
+  params.append('pP1', formatNumberForUrl(pP1, 2));
+  params.append('pP2', formatNumberForUrl(pP2, 2));
+  params.append('cfP1', formatNumberForUrl(cfP1, 2));
+  params.append('cfP2', formatNumberForUrl(cfP2, 2));
+  params.append('cfP3', formatNumberForUrl(cfP3, 2));
+  params.append('conExcedentes', String(conExcedentes));
+  params.append('excedentes', formatNumberForUrl(excedentes, 2));
+  params.append('CargaInicialBV', '0');
+
+  return `https://app.carloscodina.com/user/simulaciones/newSim?${params.toString()}`;
+}
+
+/**
+ * Copy comparator URL to clipboard
+ * @param {HTMLTableElement} table - The source table
+ */
+function copyWebComparatorUrlToClipboard(table) {
+  const comparatorUrl = buildComparatorUrl(table);
+  if (!comparatorUrl) {
+    alert('No se pudo generar la URL para el comparador web.');
+    return;
+  }
+
+  copyTextToClipboard(
+    comparatorUrl,
+    'Datos copiados al portapapeles.\nPégalos como nombre de una nueva simulacion en:\nhttps://app.carloscodina.com/user/simulaciones '
+  );
 }
 
 /**
@@ -602,36 +807,11 @@ function copyTableToClipboard(table, mode = 'all') {
     }
   });
   
-  // Copy to clipboard
-  navigator.clipboard.writeText(csvContent)
-    .then(() => {
-      const message = mode === 'excedentes' ? 
-        'Datos de excedentes copiados al portapapeles.\nPégalos en la celda D-16 del Excel de ElGrinchEnergetico!' :
-        'Datos copiados al portapapeles.\nPégalos en la celda D-8 del Excel de ElGrinchEnergetico!';
-      alert(message);
-    })
-    .catch(err => {
-      console.error('Error al copiar: ', err);
-      
-      // Fallback to the old method
-      const textarea = document.createElement('textarea');
-      textarea.value = csvContent;
-      document.body.appendChild(textarea);
-      textarea.select();
-      
-      try {
-        document.execCommand('copy');
-        const message = mode === 'excedentes' ? 
-          'Datos de excedentes copiados al portapapeles!' :
-          'Datos copiados al portapapeles!';
-        alert(message);
-      } catch (fallbackErr) {
-        console.error('Error al copiar: ', fallbackErr);
-        alert('No se pudo copiar. Intente copiar manualmente.');
-      }
-      
-      document.body.removeChild(textarea);
-    });
+  const message = mode === 'excedentes'
+    ? 'Datos de excedentes copiados al portapapeles.\nPégalos en la celda D-16 del Simulador de Tarifas Excel.\n\nDescarga la última versión del Simulador en:\nhttps://app.carloscodina.com/user/perfil'
+    : 'Datos copiados al portapapeles.\nPégalos en la celda D-8 del Simulador de Tarifas Excel.\n\nDDescarga la última versión del Simulador en:\nhttps://app.carloscodina.com/user/perfil';
+
+  copyTextToClipboard(csvContent, message);
 }
 
 /**
