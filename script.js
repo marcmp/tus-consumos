@@ -1093,7 +1093,7 @@ async function fetchFreshData(authToken, showSpinner = true) {
     console.log('Contratada P2:', contractDetails.p2);
     
     // Get consumption data
-    updateLoadingMessage('Descargando datos de consumo (esto puede tardar unos minutosss)...');
+    updateLoadingMessage('Descargando datos de consumo (esto puede tardar unos minutos)...');
     const consumptionCacheKey = createConsumptionCacheKey(
       supplyData.cups, 
       startDate, 
