@@ -583,7 +583,7 @@ function addTableCopyButton(container) {
 
   // Create button for creating a the full URL to the Web comparator and copying it to the clipboard
   const copyWebButton = createActionButton({
-    title: 'Copiar URL',
+    title: 'Copiar Todo',
     subtitle: 'Comparador Web',
     buttonClass: 'copy-web-btn',
     icon: webIcon,
@@ -754,7 +754,7 @@ function copyWebComparatorUrlToClipboard(table) {
 
   copyTextToClipboard(
     comparatorUrl,
-    'Datos copiados al portapapeles.\nPégalos como nombre de una nueva simulacion en:\nhttps://app.carloscodina.com/user/simulaciones '
+    'Datos copiados al portapapeles.\n\nPégalos como nombre de una nueva simulacion en:\nhttps://app.carloscodina.com/user/simulaciones '
   );
 }
 
@@ -809,7 +809,7 @@ function copyTableToClipboard(table, mode = 'all') {
   
   const message = mode === 'excedentes'
     ? 'Datos de excedentes copiados al portapapeles.\nPégalos en la celda D-16 del Simulador de Tarifas Excel.\n\nDescarga la última versión del Simulador en:\nhttps://app.carloscodina.com/user/perfil'
-    : 'Datos copiados al portapapeles.\nPégalos en la celda D-8 del Simulador de Tarifas Excel.\n\nDDescarga la última versión del Simulador en:\nhttps://app.carloscodina.com/user/perfil';
+    : 'Datos copiados al portapapeles.\nPégalos en la celda D-8 del Simulador de Tarifas Excel.\n\nDescarga la última versión del Simulador en:\nhttps://app.carloscodina.com/user/perfil';
 
   copyTextToClipboard(csvContent, message);
 }
@@ -1161,7 +1161,7 @@ async function fetchFreshData(authToken, showSpinner = true) {
     console.log('Contratada P2:', contractDetails.p2);
     
     // Get consumption data
-    updateLoadingMessage('Descargando datos de consumo (esto puede tardar unos segundos)...');
+    updateLoadingMessage('Descargando datos de consumo (esto puede tardar unos minutos)...');
     const consumptionCacheKey = createConsumptionCacheKey(
       supplyData.cups, 
       startDate, 

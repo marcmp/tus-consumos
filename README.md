@@ -6,7 +6,7 @@ A privacy-first tool to import and review your electricity consumption & product
 
 Tus Consumos is a client-side web application that uses the Datadis APIs to retrieve and display energy usage data for electricity contracts in Spain.
 
-This tool can be used as a companion app to "El Grinch Energetico" Excel spreadsheet to help you find the best energy price option in Spain based on your consumption habits.
+This tool can be used as a companion app to CarlosCodina.com Excel spreadsheet to help you find the best energy price option in Spain based on your consumption habits.
 
 Privacy is and should be a first-class citizen in this project. The tool only makes network calls to Datadis servers and GoatCounter, an open-source and GDPR-compliant analytics script used to track page usage.
 
@@ -17,7 +17,7 @@ Privacy is and should be a first-class citizen in this project. The tool only ma
 - User authentication with Datadis.es credentials (you'll need an account first).
 - Retrieval of electricity consumption and production data.
 - Visualization of monthly consumption and production pattern.
-- Easy export functionality to "El Grinch Energético" Excel spreadsheet.
+- Easy export functionality to Carlos Codina's "Simulador de Tarifas" Excel spreadsheet.
 - Privacy-first approach: none of your consumption data ever leaves your browser; only makes calls to the Datadis API (this is where your consumption data is stored).
 - Includes an ad-hoc mock server for development and testing purposes.
 - Supports TD2.0 bills only.
@@ -26,10 +26,11 @@ Privacy is and should be a first-class citizen in this project. The tool only ma
 
 1. Create a [Datadis account](https://www.datadis.es).
 2. Log-in to [Tus Consumos website](https://marcmp.github.io/tus-consumos/) using your Datadis credentials.
-3. Download the latest [Grinch Energético excel spreadsheet](https://grinchenergetico.com/comparador-de-tarifas/).
+3. Download the example [CarlosCodina.com Excel spreadsheet](https://bit.ly/3IK4G6p).
 4. Paste your consumption/production data to the spreadsheet to calculate your best electricity bill price.
+or Paste data to the CarlosCodina's ComparadorWeb
 
-**Don't know how to use the ElGrinchEnergético Excel spreadsheet?** Then, watch his instructions in video [here](https://grinchenergetico.com/comparador-de-tarifas/).
+**Don't know how to use the Carlos Codina's  Excel spreadsheet?** Then, watch his instructions in video [here](https://carloscodina.com/comparador-de-tarifas/).
 
 
 ## Installation (prod-environment or local)
@@ -119,4 +120,4 @@ corresponding source code.
 
 For more information about your rights, see the LICENSE file or visit https://www.gnu.org/licenses/agpl-3.0.en.html
 
-The project is not affiliated with or endorsed by Datadis nor "El Grinch Energético".
+The project is not affiliated with or endorsed by Datadis nor Carlos Codina.
