@@ -367,11 +367,11 @@ h1, h2, h3, h4, h5, h6 {
 .consumption-table .row-label {
     font-weight: bold;
     text-align: left;
-    background-color: white !important;
+    background-color: white;
 }
 
 .consumption-table .row-group-header {
-    background-color: white !important;
+    background-color: white;
     font-weight: bold;
     text-align: left;
     vertical-align: middle;
@@ -386,36 +386,30 @@ h1, h2, h3, h4, h5, h6 {
     background-color: #f9d423; /* Match copy-all-btn color */
 }
 
-/* Section styles */
-.consumption-table .section-header td:not(.data-cell) {
-    background-color: white !important;
-}
-
-/* Apply yellow background to description and days rows */
-.consumption-table .description-row td.data-cell,
-.consumption-table .days-row td.data-cell {
-    background-color: #f9d423 !important; /* Match copy-all-btn color */
-}
-
 .consumption-table .days-row {
+    border-top: none;
+    border-bottom: none;
+}
+
+.consumption-table .days-row td {
     border-top: 2px solid #000;
     border-bottom: 2px solid #000;
 }
 
-/* Target the second power row specifically */
-.consumption-table tr.power-section.power-row:nth-of-type(5) {
+/* Target the second consecutive power row in a robust way */
+.consumption-table tr.power-row + tr.power-row td {
     border-bottom: 2px solid #000;
 }
 
 /* Override total row background */
 .consumption-table .total-row td.data-cell {
     font-weight: bold;
-    background-color: white !important;
+    background-color: white;
 }
 
 /* Excedentes row - special color to match its button */
 .consumption-table .excedentes-row td.data-cell {
-    background-color: #6ECF70 !important; /* Lighter green to match the excedentes button */
+    background-color: #6ECF70; /* Lighter green to match the excedentes button */
     color: #000;
 }
 

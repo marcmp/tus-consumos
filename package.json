@@ -1,7 +1,7 @@
 {
   "name": "tus-consumos",
   "version": "1.0.0",
-  "description": "Datadis client for ElGrinchEnergetico",
+  "description": "Datadis client for CarlosCodina.com website",
   "type": "module",
   "main": "script.js",
   "license": "AGPL-3.0-or-later",

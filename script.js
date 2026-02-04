@@ -240,6 +240,62 @@ function formatMonthDisplay(monthKey) {
   return date.toLocaleString('default', { month: 'short', year: 'numeric' });
 }
 
+/**
+ * Format month key to short table/export label (e.g. "2024/03" -> "Mar-24")
+ * @param {string} monthKey - Month key in format YYYY/MM
+ * @returns {string} Formatted short label
+ */
+function formatMonthShortLabel(monthKey) {
+  const [year, month] = monthKey.split('/');
+  const shortYear = year.slice(-2);
+  const date = new Date(Number(year), Number(month) - 1);
+  const monthName = date.toLocaleString('en-US', { month: 'short' });
+  return `${monthName}-${shortYear}`;
+}
+
+/**
+ * Normalize numeric values for JSON export
+ * @param {number|string} value - Value to normalize
+ * @param {number} decimals - Number of decimal places
+ * @returns {number} Normalized number
+ */
+function normalizeExportNumber(value, decimals = 3) {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return 0;
+  return Number(numericValue.toFixed(decimals));
+}
+
+/**
+ * Build JSON export payload from processed consumption data
+ * @param {Object} processedData - Processed data structure
+ * @param {Object|null} contractDetails - Contract details with power values
+ * @returns {Array<Object>} JSON-ready monthly payload
+ */
+function buildJsonExportData(processedData, contractDetails = null) {
+  const byMonth = processedData?.summaries?.byMonth;
+  if (!byMonth || !Array.isArray(byMonth.months) || !byMonth.data) {
+    return [];
+  }
+
+  const potenciaP1 = normalizeExportNumber(contractDetails?.p1, 3);
+  const potenciaP2 = normalizeExportNumber(contractDetails?.p2, 3);
+
+  return byMonth.months.map(monthKey => {
+    const monthEntry = byMonth.data[monthKey] || {};
+
+    return {
+      name: formatMonthShortLabel(monthKey),
+      dias: Number.isFinite(monthEntry.days) ? monthEntry.days : 0,
+      consumoP1: normalizeExportNumber(monthEntry.P1, 3),
+      consumoP2: normalizeExportNumber(monthEntry.P2, 3),
+      consumoP3: normalizeExportNumber(monthEntry.P3, 3),
+      potenciaP1,
+      potenciaP2,
+      excedentes: normalizeExportNumber(monthEntry.surplusEnergyKWh, 3)
+    };
+  });
+}
+
 
 /**
  * UI FUNCTIONS
@@ -264,22 +320,6 @@ if (isBrowser) {
       showLoginForm();
     }
   };
-}
-
-/**
- * Initialize the application
- */
-function initializeApp() {
-  // Set up event listeners
-  document.addEventListener('submit', handleFormSubmissions);
-  
-  // Show the login form if not authenticated
-  if (!checkAuth()) {
-    showLoginForm(); // Explicitly call showLoginForm to ensure the form is rendered
-    document.getElementById('login-container').style.display = 'flex'; // Change to 'flex' to center the form
-  } else {
-    showDashboard(); // Show the dashboard if already authenticated
-  }
 }
 
 /**
@@ -444,14 +484,9 @@ function renderConsumptionTable(data, addressInfo = null, cups = null, contractD
   // Extract monthly data from the processed data
   const { months, data: monthlyData } = data.summaries.byMonth;
   
-  // Format months as "Feb-23" style
-  const formattedMonths = months.map(m => {
-    const [year, month] = m.split('/');
-    const shortYear = year.substring(2);
-    const date = new Date(year, parseInt(month) - 1);
-    const monthName = date.toLocaleString('default', { month: 'short' });
-    return `${monthName}-${shortYear}`;
-  });
+  // Format months and prepare export payload from the same data source
+  const formattedMonths = months.map(formatMonthShortLabel);
+  const jsonExportData = buildJsonExportData(data, contractDetails);
 
   // Create table HTML structure using template literals for better readability
   const tableHTML = `
@@ -511,14 +546,15 @@ function renderConsumptionTable(data, addressInfo = null, cups = null, contractD
   container.innerHTML += tableHTML;
   
   // Add buttons to copy table data to clipboard
-  addTableCopyButton(container);
+  addTableCopyButton(container, jsonExportData);
 }
 
 /**
  * Add buttons to copy table data to clipboard
  * @param {HTMLElement} container - The container element for the table
+ * @param {Array<Object>} jsonExportData - JSON data built from processed source data
  */
-function addTableCopyButton(container) {
+function addTableCopyButton(container, jsonExportData = []) {
   // Create a container for the buttons
   const buttonContainer = document.createElement('div');
   buttonContainer.className = 'copy-actions';
@@ -581,15 +617,14 @@ function addTableCopyButton(container) {
     }
   });
 
-  // Create button for creating a the full URL to the Web comparator and copying it to the clipboard
+  // Create button for copying complete JSON data for the Web comparator
   const copyWebButton = createActionButton({
     title: 'Copiar Todo',
     subtitle: 'Comparador Web',
     buttonClass: 'copy-web-btn',
     icon: webIcon,
     onClick: () => {
-      const table = container.querySelector('table');
-      copyWebComparatorUrlToClipboard(table);
+      copyWebComparatorJsonToClipboard(jsonExportData);
     }
   });
   copyWebButton.setAttribute('aria-label', 'Copiar Todo para Comparador Web');
@@ -640,120 +675,17 @@ function copyTextToClipboard(text, successMessage) {
 }
 
 /**
- * Parse a Spanish-formatted number (e.g. "1.234,56")
- * @param {string} value - Text value to parse
- * @returns {number} Parsed number
+ * Copy web-export JSON payload to clipboard
+ * @param {Array<Object>} exportData - JSON export payload
  */
-function parseSpanishNumber(value) {
-  if (!value) return 0;
-  const normalizedValue = value
-    .replace(/\./g, '')
-    .replace(',', '.')
-    .replace(/[^\d.-]/g, '');
-  const parsedValue = Number(normalizedValue);
-  return Number.isFinite(parsedValue) ? parsedValue : 0;
-}
-
-/**
- * Format a number for URL params using dot as decimal separator
- * @param {number} value - Number to format
- * @param {number} decimals - Maximum decimal places
- * @returns {string} Formatted number
- */
-function formatNumberForUrl(value, decimals = 2) {
-  return Number(value.toFixed(decimals)).toString();
-}
-
-/**
- * Get data values from a table row, skipping header cells
- * @param {HTMLTableRowElement} row - Table row element
- * @returns {string[]} Data cell text values
- */
-function getRowDataValues(row) {
-  if (!row) return [];
-  const cells = Array.from(row.cells);
-  const startIdx = cells.length > 13 ? 2 : 1;
-  return cells.slice(startIdx).map(cell => cell.textContent.trim());
-}
-
-/**
- * Find a table row by label and optional row class
- * @param {HTMLTableElement} table - Table element
- * @param {string} label - Row label text to match
- * @param {string|null} requiredClass - Optional class constraint
- * @returns {HTMLTableRowElement|undefined} Matching row
- */
-function findTableRow(table, label, requiredClass = null) {
-  return Array.from(table.rows).find(row => {
-    const rowLabel = row.querySelector('.row-label')?.textContent.trim();
-    if (rowLabel !== label) return false;
-    return requiredClass ? row.classList.contains(requiredClass) : true;
-  });
-}
-
-/**
- * Build comparator URL from current table values
- * @param {HTMLTableElement} table - The source table
- * @returns {string|null} Comparator URL or null on missing data
- */
-function buildComparatorUrl(table) {
-  if (!table) return null;
-
-  const daysRow = findTableRow(table, 'Días');
-  const powerPuntaRow = findTableRow(table, 'Punta', 'power-row');
-  const powerValleRow = findTableRow(table, 'Valle', 'power-row');
-  const energyPuntaRow = findTableRow(table, 'Punta', 'consumption-row');
-  const energyLlanaRow = findTableRow(table, 'Llana', 'consumption-row');
-  const energyValleRow = findTableRow(table, 'Valle', 'consumption-row');
-  const excedentesRow = findTableRow(table, 'Excedentes (kWh)', 'excedentes-row');
-
-  if (!daysRow || !powerPuntaRow || !powerValleRow || !energyPuntaRow || !energyLlanaRow || !energyValleRow || !excedentesRow) {
-    return null;
-  }
-
-  const sumRow = row => getRowDataValues(row).reduce((total, value) => total + parseSpanishNumber(value), 0);
-  const getLastValue = row => {
-    const rowValues = getRowDataValues(row);
-    const lastValue = rowValues[rowValues.length - 1];
-    return parseSpanishNumber(lastValue);
-  };
-
-  const dias = Math.round(sumRow(daysRow));
-  const pP1 = getLastValue(powerPuntaRow);
-  const pP2 = getLastValue(powerValleRow);
-  const cfP1 = sumRow(energyPuntaRow);
-  const cfP2 = sumRow(energyLlanaRow);
-  const cfP3 = sumRow(energyValleRow);
-  const excedentes = sumRow(excedentesRow);
-  const conExcedentes = excedentes > 0 ? 1 : 0;
-
-  const params = new URLSearchParams();
-  params.append('dias', String(dias));
-  params.append('pP1', formatNumberForUrl(pP1, 2));
-  params.append('pP2', formatNumberForUrl(pP2, 2));
-  params.append('cfP1', formatNumberForUrl(cfP1, 2));
-  params.append('cfP2', formatNumberForUrl(cfP2, 2));
-  params.append('cfP3', formatNumberForUrl(cfP3, 2));
-  params.append('conExcedentes', String(conExcedentes));
-  params.append('excedentes', formatNumberForUrl(excedentes, 2));
-  params.append('CargaInicialBV', '0');
-
-  return `https://app.carloscodina.com/user/simulaciones/newSim?${params.toString()}`;
-}
-
-/**
- * Copy comparator URL to clipboard
- * @param {HTMLTableElement} table - The source table
- */
-function copyWebComparatorUrlToClipboard(table) {
-  const comparatorUrl = buildComparatorUrl(table);
-  if (!comparatorUrl) {
-    alert('No se pudo generar la URL para el comparador web.');
+function copyWebComparatorJsonToClipboard(exportData) {
+  if (!Array.isArray(exportData) || exportData.length === 0) {
+    alert('No se pudieron preparar los datos del comparador web.');
     return;
   }
 
   copyTextToClipboard(
-    comparatorUrl,
+    JSON.stringify(exportData, null, 2),
     'Datos copiados al portapapeles.\n\nPégalos como nombre de una nueva simulacion en:\nhttps://app.carloscodina.com/user/simulaciones '
   );
 }
@@ -1161,7 +1093,7 @@ async function fetchFreshData(authToken, showSpinner = true) {
     console.log('Contratada P2:', contractDetails.p2);
     
     // Get consumption data
-    updateLoadingMessage('Descargando datos de consumo (esto puede tardar unos minutos)...');
+    updateLoadingMessage('Descargando datos de consumo (esto puede tardar unos minutosss)...');
     const consumptionCacheKey = createConsumptionCacheKey(
       supplyData.cups, 
       startDate, 
@@ -1260,12 +1192,13 @@ async function fetchFreshData(authToken, showSpinner = true) {
  * @param {number} expirationHours - Hours until expiration (default: 24)
  */
 function setCache(key, data, expirationHours = 24) {
+  const cacheItem = {
+    data,
+    timestamp: Date.now(),
+    expires: Date.now() + (expirationHours * 60 * 60 * 1000)
+  };
+
   try {
-    const cacheItem = {
-      data,
-      timestamp: Date.now(),
-      expires: Date.now() + (expirationHours * 60 * 60 * 1000)
-    };
     localStorage.setItem(key, JSON.stringify(cacheItem));
   } catch (error) {
     // Check specifically for quota exceeded errors
@@ -1380,6 +1313,9 @@ export {
   calculateTotalConsumption,
   calculatePeriodTotal,
   processConsumptionData,
+  buildJsonExportData,
+  copyTableToClipboard,
+  copyWebComparatorJsonToClipboard,
   showCacheNotification,
   getCache,
   setCache,
