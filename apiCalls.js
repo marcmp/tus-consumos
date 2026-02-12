@@ -173,9 +173,10 @@ async function getDistributorsWithSupplies(authToken) {
  * Get supplies data for a distributor
  * @param {string} authToken - Authorization token
  * @param {string} distributorCode - Distributor code
- * @returns {Promise<Object>} - Supplies data
+ * @returns {Promise<Array>} - Supplies data (0..N entries)
  */
 async function getSuppliesData(authToken, distributorCode) {
+
   const result = await makeApiCall(
     apiEndpoints.api.supplies,
     {
@@ -189,23 +190,16 @@ async function getSuppliesData(authToken, distributorCode) {
     }
   );
   
-  const supplies = result.supplies;
-  
-  // If there's only one supply, return it directly with addressInfo
-  if (supplies.length === 1) {
-    const supply = supplies[0];
-    const addressInfo = `${supply.address}, ${supply.municipality}, ${supply.postalCode} ${supply.province}`;
-    
-    return {
-      cups: supply.cups,
-      pointType: supply.pointType,
-      distributorCode: supply.distributorCode,
-      addressInfo: addressInfo
-    };
-  }
-  
-  // Return all supplies for user selection
-  return { supplies, multipleSupplies: true };
+  const supplies = Array.isArray(result.supplies) ? result.supplies : [];
+
+  return supplies.map(supply => ({
+    ...supply,
+    addressInfo: [
+      supply.address,
+      [supply.postalCode, supply.municipality].filter(Boolean).join(' '),
+      supply.province
+    ].filter(Boolean).join(', ')
+  }));
 }
 
 /**

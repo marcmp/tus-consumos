@@ -942,7 +942,6 @@ function showCacheNotification(cacheDate, addressInfo = '') {
 /**
  * Display a modal for the user to select a supply
  * @param {Array} supplies - List of supplies
- * @param {string} authToken - Authorization token
  * @returns {Promise<Object>} - Selected supply data
  */
 function showSupplySelectionModal(supplies) {
@@ -960,15 +959,9 @@ function showSupplySelectionModal(supplies) {
           <h2>Selecciona un suministro</h2>
           <p>Se han encontrado varios suministros. Por favor, selecciona uno:</p>
           <div class="supply-list">
-            ${supplies.map(supply => `
-              <button class="supply-item" data-cups="${supply.cups}" 
-                data-pointtype="${supply.pointType}" 
-                data-distributorcode="${supply.distributorCode}"
-                data-address="${encodeURIComponent(supply.address)}"
-                data-municipality="${encodeURIComponent(supply.municipality)}"
-                data-postalcode="${encodeURIComponent(supply.postalCode)}"
-                data-province="${encodeURIComponent(supply.province)}">
-                <strong>${supply.cups}</strong> (${supply.address})
+            ${supplies.map((supply, index) => `
+              <button class="supply-item" data-supply-index="${index}">
+                <strong>${supply.cups}</strong> (${supply.addressInfo || supply.address || 'Sin dirección'})
               </button>
             `).join('')}
           </div>
@@ -982,31 +975,17 @@ function showSupplySelectionModal(supplies) {
     // Add event listeners to all supply buttons
     document.querySelectorAll('.supply-item').forEach(button => {
       button.addEventListener('click', () => {
-        // Get supply data from button attributes
-        const cups = button.getAttribute('data-cups');
-        const pointType = button.getAttribute('data-pointtype');
-        const distributorCode = button.getAttribute('data-distributorcode');
-        const address = decodeURIComponent(button.getAttribute('data-address'));
-        const municipality = decodeURIComponent(button.getAttribute('data-municipality'));
-        const postalCode = decodeURIComponent(button.getAttribute('data-postalcode'));
-        const province = decodeURIComponent(button.getAttribute('data-province'));
+        const supplyIndex = Number(button.getAttribute('data-supply-index'));
+        const selectedSupply = supplies[supplyIndex];
         
         // Remove modal
         const modalOverlay = document.querySelector('.modal-overlay');
         if (modalOverlay) {
           document.body.removeChild(modalOverlay);
         }
-        
-        // Create formatted address string
-        const addressInfo = `${address}, ${municipality}, ${postalCode}, ${province}`;
-        
+
         // Resolve with selected supply
-        resolve({
-          cups,
-          pointType,
-          distributorCode,
-          addressInfo
-        });
+        resolve(selectedSupply);
       });
     });
   });
@@ -1035,22 +1014,55 @@ async function fetchFreshData(authToken, showSpinner = true) {
     
     // API flow to get all the required data
     updateLoadingMessage('Obteniendo distribuidoras...');
-    const distributorCode = await getDistributorsWithSupplies(authToken);
-    console.log('Distributor code:', distributorCode);
+    const distributorCodesResponse = await getDistributorsWithSupplies(authToken);
+    const distributorCodes = Array.isArray(distributorCodesResponse)
+      ? distributorCodesResponse
+      : [distributorCodesResponse].filter(Boolean);
+
+    if (distributorCodes.length === 0) {
+      throw new Error('No se encontraron distribuidoras con suministros.');
+    }
+
+    console.log('Distributor codes:', distributorCodes);
     
-    // Get supplies and handle multiple supplies case
+    // Get supplies for each distributor independently and merge results.
     updateLoadingMessage('Obteniendo puntos de suministro...');
-    const suppliesResult = await getSuppliesData(authToken, distributorCode);
-    
+    const mergedSupplies = [];
+
+    for (let index = 0; index < distributorCodes.length; index++) {
+      const distributorCode = distributorCodes[index];
+      if (distributorCodes.length > 1) {
+        updateLoadingMessage(`Obteniendo puntos de suministro (${index + 1}/${distributorCodes.length})...`);
+      }
+
+      const suppliesResult = await getSuppliesData(authToken, distributorCode);
+      if (Array.isArray(suppliesResult)) {
+        mergedSupplies.push(...suppliesResult);
+      }
+    }
+
+    const uniqueSupplies = Array.from(
+      new Map(
+        mergedSupplies.map(supply => [
+          `${supply.distributorCode}-${supply.cups}`,
+          supply
+        ])
+      ).values()
+    );
+
+    if (uniqueSupplies.length === 0) {
+      throw new Error('No se encontraron puntos de suministro para las distribuidoras disponibles.');
+    }
+
     // If multiple supplies returned, show selection modal
     let supplyData;
-    if (suppliesResult.multipleSupplies) {
+    if (uniqueSupplies.length > 1) {
       hideLoadingSpinner(); // Hide spinner during selection
-      supplyData = await showSupplySelectionModal(suppliesResult.supplies, authToken);
+      supplyData = await showSupplySelectionModal(uniqueSupplies);
       // Create a new spinner after the modal is closed
       showLoadingSpinner('Procesando suministro seleccionado...');
     } else {
-      supplyData = suppliesResult;
+      supplyData = uniqueSupplies[0];
     }
     
     console.log('Selected supply cups:', supplyData.cups);
