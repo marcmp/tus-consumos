@@ -10,8 +10,8 @@
         "municipality": "MADRID",
         "postalCode": "07020",
         "contractedPowerkW": [
-            3,6,
-            4.2
+            3.75,
+            4.45
         ],
         "timeDiscrimination": "TARIFA DE TRES PERIODOS",
         "modePowerControl": "ICP",

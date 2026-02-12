@@ -277,8 +277,8 @@ function buildJsonExportData(processedData, contractDetails = null) {
     return [];
   }
 
-  const potenciaP1 = normalizeExportNumber(contractDetails?.p1, 3);
-  const potenciaP2 = normalizeExportNumber(contractDetails?.p2, 3);
+  const potenciaP1 = normalizeExportNumber(contractDetails?.p1, 2);
+  const potenciaP2 = normalizeExportNumber(contractDetails?.p2, 2);
 
   return byMonth.months.map(monthKey => {
     const monthEntry = byMonth.data[monthKey] || {};
@@ -509,11 +509,11 @@ function renderConsumptionTable(data, addressInfo = null, cups = null, contractD
       <tr class="power-section power-row">
         <td class="row-group-header" rowspan="2">Potencia (kW)</td>
         <td class="row-label">Punta</td>
-        ${Array.from({length: 12}, () => `<td class="data-cell">${contractDetails?.p1 ? formatNumberES(contractDetails.p1, 1) : ''}</td>`).join('')}
+        ${Array.from({length: 12}, () => `<td class="data-cell">${contractDetails?.p1 ? formatNumberES(contractDetails.p1, 2) : ''}</td>`).join('')}
       </tr>
       <tr class="power-section power-row">
         <td class="row-label">Valle</td>
-        ${Array.from({length: 12}, () => `<td class="data-cell">${contractDetails?.p2 ? formatNumberES(contractDetails.p2, 1) : ''}</td>`).join('')}
+        ${Array.from({length: 12}, () => `<td class="data-cell">${contractDetails?.p2 ? formatNumberES(contractDetails.p2, 2) : ''}</td>`).join('')}
       </tr>
       <tr class="energy-section consumption-row">
         <td class="row-group-header" rowspan="5">Energía (kWh)</td>
