@@ -4,13 +4,13 @@ A privacy-first tool to import and review your electricity consumption & product
 
 ## Project Overview
 
-Tus Consumos is a client-side web application that uses the Datadis APIs to retrieve and display energy usage data for electricity contracts in Spain.
+Tus Consumos is a client-side web application that uses the Datadis API to retrieve and display energy usage data for electricity contracts in Spain.
 
-This tool can be used as a companion app to CarlosCodina.com Excel spreadsheet to help you find the best energy price option in Spain based on your consumption habits.
+This tool can be used as a companion app to CarlosCodina.com electricity bill simulators (excel or web),  to help you find the best energy price option based on your consumption habits.
 
-Privacy is and should be a first-class citizen in this project. The tool only makes network calls to Datadis servers and GoatCounter, an open-source and GDPR-compliant analytics script used to track page usage.
+Privacy is and should be a first-class citizen in this project; the code only runs on the client-side. The tool only makes network calls to Datadis servers as a source of truth, and GoatCounter, an open-source and GDPR-compliant analytics script used to track page usage.
 
-**Why Datadis?**  Datadis provides a single API to communicate to every energy distributor in Spain.
+**Why Datadis?**  Datadis provides a single API to communicate to almost every energy distributor in Spain.
 
 ## Features
 
