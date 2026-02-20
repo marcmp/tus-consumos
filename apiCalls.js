@@ -107,20 +107,14 @@ async function makeApiCall(endpoint, options = {}) {
  */
 async function authorizeApiCall(username, password) {
   const endpoint = apiEndpoints.auth.login;
-  
-  // Construct URL with parameters
   const url = new URL(endpoint);
-  const params = new URLSearchParams({
-    username: username,
-    password: password
-  });
-  url.search = params.toString();
 
   const response = await fetch(url, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
     },
+    body: new URLSearchParams({ username, password }).toString()
   });
   if (!response.ok) throw new Error('Login failed');
   
